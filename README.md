@@ -26,7 +26,7 @@ Traditional promotional merchandise platforms suffer from low-contrast generic t
 | :--- | :--- | :--- |
 | **Framework** | **Next.js 16 (App Router)** + **React 19** + **TypeScript** | Unified full-stack architecture combining server components, streaming routes, zero-CORS internal API routes, and instant builds with Turbopack. |
 | **Styling & Tokens** | **Tailwind CSS v4** + **Custom OKLCH Tokens** | Precise mathematical color curves (`oklch`), custom radius rhythm (`8px`, `14px`, `22px`, `32px`), and customized elevation shadows. |
-| **Motion & Micro-interactions** | **Framer Motion (`motion`)** + **GSAP** + **Canvas Confetti** | Smooth drawer slide-overs, interactive 3D hero perspective tilts, number easing, and celebratory order completion bursts. Wrapped in `prefers-reduced-motion` safety checks. |
+| **Motion & Micro-interactions** | **Lenis Smooth Scroll** + **Framer Motion** + **GSAP** + **Canvas Physics** | Buttery smooth momentum scrolling, interactive hardware-accelerated particle constellation with cursor attraction, magnetic spring buttons, cursor spotlight border glows, and celebratory confetti. Full `prefers-reduced-motion` compliance. |
 | **Database & Data Layer** | **MongoDB (Mongoose ODM)** with **Zero-Config Resilient In-Memory Fallback** | Flexible document modeling for nested product variants, customizable specifications, and complex order logs with zero reviewer setup friction (detailed below). |
 | **Icons & Typography** | **Lucide React** + **Space Grotesk** + **Inter** | Punchy geometric headline typography paired with ultra-clean modern body type and sharp line iconography. |
 
@@ -48,16 +48,29 @@ For the APEX MEDIA CO collateral platform, **MongoDB** was selected over Postgre
 
 ```
 apex-media-co/
+├── Global Transition & Scroll Layer
+│   ├── Lenis Inertia Momentum Smooth Scrolling (touch and wheel normalized)
+│   ├── Cinematic Route Transitions (src/app/template.tsx) with Glowing Cobalt Progress Sweep
+│   └── Dynamic Cursor Spotlight Border Glow on frosted glass panels
+│
 ├── / (Home / Landing)
 │   ├── Floating Glassmorphic Header with Live Cart Badge
+│   ├── Interactive Hardware-Accelerated Particle Constellation Background
 │   ├── Kinetic Typography Headline + Ambient Backlight
+│   ├── Magnetic CTA Buttons (Spring gravity toward cursor)
 │   ├── Interactive 3D Hero Centerpiece (Live Tab Switcher & Specular Highlight)
 │   ├── Partner Trust Ticker (Hyperion, Nexus, Aether, etc.)
 │   ├── Bento-Grid Modular Capabilities Showcase
-│   ├── Flagship Collateral Kits Grid with Instant Add
+│   ├── Flagship Collateral Kits Grid with Instant Add & Quick Spec Inspection
 │   ├── Scroll-Triggered Animated Stats Counters (140+ Campaigns, 99.8% On-Time)
 │   ├── Client Testimonials & Summit Case Studies
 │   ├── High-Conversion Closing CTA Banner
+│   └── Multi-Column Agency Footer with Live Operational Hub Status
+│
+├── Inline Quick-Spec Inspection Drawer
+│   ├── Instant Glassmorphic Slide-In Drawer from Catalog & Featured Grids
+│   ├── Full Bill of Materials, Engineering Tolerances, and Certifications
+│   └── Instant Quick-Add to Cart without leaving current browsing context
 │   └── Multi-Column Agency Footer with Live Operational Hub Status
 │
 ├── /products (Collateral Catalog)
