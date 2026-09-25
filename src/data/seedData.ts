@@ -74,7 +74,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 620,
     category: 'VIP Kits',
     images: [
-      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=80',
+      '/images/vault-gold.jpg',
       '/images/agency/executive-boardroom.jpg',
       '/images/logistics/terminal-night.jpg',
       'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80'

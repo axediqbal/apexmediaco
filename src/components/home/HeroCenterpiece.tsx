@@ -51,7 +51,7 @@ export const HeroCenterpiece: React.FC = () => {
       badge: 'Interactive 3D Vault',
       leadTime: '4-6 Days',
       metric: '0.05mm CNC Precision',
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1000&q=80',
+      image: '/images/vault-gold.jpg',
     },
     vault: {
       name: 'APEX VIP Onboarding Vault',
@@ -60,7 +60,7 @@ export const HeroCenterpiece: React.FC = () => {
       badge: 'Bespoke Milled',
       leadTime: '4-6 Days',
       metric: '0.05mm CNC Precision',
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1000&q=80',
+      image: '/images/vault-gold.jpg',
     },
     apparel: {
       name: 'Obsidian Executive Softshell',
