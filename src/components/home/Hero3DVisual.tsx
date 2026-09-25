@@ -4,39 +4,25 @@
  * @file Hero3DVisual.tsx
  * @description Photorealistic 3D Safe Vault for APEX MEDIA CO.
  * 
- * DESIGN & COLOR GRADING SPECS:
- * - 100% Authentically addresses user feedback:
- *   "poora black kardiya hay ajeeb real vault bana k khatam karo yrr mujhay deploy karna hay...
- *    theme dark colour men hay tou make different colour cause theme se match hoga tou vault kaddu dikhega? theek karo isse"
- * 
- * ROOT CAUSES RESOLVED:
- * 1. ORIENTATION FIX: The 3D model's heavy door, massive 5-spoke wheel, chrome locking pins, and dial tumbler
- *    were modeled at negative Z (-20). Previous rotation faced the flat back wall towards the camera!
- *    Now rotated with Math.PI showcase angle so the FRONT VAULT DOOR & GOLD WHEEL proudly face the user!
- * 2. REALISTIC HIGH-CONTRAST METALLIC COLOR GRADING (Different from dark theme, pops 100%):
- *    - Chassis & Armor Frame (Box001-005, Box015): Luminous Brushed Platinum Stainless Steel (#E0E7EE)
- *    - Vault Door Face (Box006): Machined Aerospace Titanium-Silver Plate (#F4F7FA)
- *    - Door Inset Plate (Box020): Rich Brushed 24K Imperial Gold Accent Plate (#E5B838)
- *    - 5-Spoke Wheel & Hub (Cylinder001-006): Solid 24K Imperial Polished Gold (#FBBF24, metalness: 0.96, roughness: 0.08)
- *    - Locking Bolts & Hinge Pins (Cylinder008-013): Mirror-Polished Hardened Chrome Steel (#FFFFFF, roughness: 0.03)
- *    - Hinge Blocks (Box007, 008, 016): Forged Steel Alloy (#CBD5E1)
- *    - Biometric Tumbler Core (Cylinder007): Electric Cobalt Laser Core (#2D68FF) with 24K Gold Graduation Ring
- * 3. STUDIO LIGHTING RIG:
- *    - 5-point studio lighting with high specular key light, warm golden wheel fill, and crisp white rim.
- *    - RoomEnvironment PMREM generator for continuous real-world studio reflections.
- *    - ACES Filmic Tone Mapping with balanced 1.45 exposure.
- * 4. INTERACTIVE PRESET SWITCHER:
- *    - Allows instant switching between "Executive Platinum & Gold", "Luxury Champagne White", and "Mirror Chrome".
+ * SPECIFICATIONS:
+ * - Color Theme: Locked strictly to authentic "Gold & Steel"
+ *   - Outer Armor Chassis & Walls: Heavy Gunmetal Brushed Titanium Steel (#4F5869)
+ *   - Open Vault Door Face: Machined Titanium Plate (#64748B) with original brushed metal texture
+ *   - Door Inset Plate & Fasteners: 24K Imperial Gold Plate (#D4AF37)
+ *   - 5-Spoke Combination Lock Wheel & Hub: Solid Polished 24K Pure Gold (#F59E0B, metalness: 0.98, roughness: 0.08)
+ *   - Locking Bolts & Hinge Pins: Mirror-Polished Hardened Chrome Steel (#FFFFFF, metalness: 1.0, roughness: 0.03)
+ *   - Interior Vault Cavity: Concealed Warm Golden Downlight (#FFBE3B)
+ *   - Presentation Stage: Sleek Dark Obsidian Plinth (#0D121C) with razor-thin cobalt hairline
+ * - Interactive: 360° Drag-to-Rotate, Click-to-Spin Combination Wheel
+ * - UI: Minimal, clean, distraction-free (control bar removed as requested).
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { Rotate3d, Box, RefreshCw, Shield, Sparkles, Palette } from 'lucide-react';
+import { Rotate3d, Shield } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-
-type VaultPreset = 'platinum-gold' | 'champagne-white' | 'mirror-chrome';
 
 interface Hero3DVisualProps {
   posterFallback?: string;
@@ -45,14 +31,10 @@ interface Hero3DVisualProps {
 
 export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   posterFallback = '/images/agency/ai-creative-lab.jpg',
-  splineSceneUrl = 'https://my.spline.design/particlenebula-ca85860d5c8fa440a33e9d8924b12368/',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mode, setMode] = useState<'three' | 'spline'>('three');
-  const [preset, setPreset] = useState<VaultPreset>('platinum-gold');
   const [isLoading, setIsLoading] = useState(true);
-  const [wireframeMode, setWireframeMode] = useState(false);
   const [isDialSpinning, setIsDialSpinning] = useState(false);
   const prefersReduced = usePrefersReducedMotion();
 
@@ -68,118 +50,15 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   const pointLightRef = useRef<THREE.PointLight | null>(null);
   const dialRotationRef = useRef<number>(0);
 
-  // Material references for instant preset swapping
-  const matChassisRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matDoorRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matInsetRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matWheelRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matChromeRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matHingeRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
-  const matCoreRef = useRef<THREE.MeshStandardMaterial | null>(null);
-
-  // Apply chosen grading preset to existing materials
-  const applyPreset = useCallback((targetPreset: VaultPreset) => {
-    setPreset(targetPreset);
-
-    if (!matChassisRef.current || !matDoorRef.current || !matInsetRef.current || !matWheelRef.current || !matChromeRef.current) {
-      return;
-    }
-
-    if (targetPreset === 'platinum-gold') {
-      // 1. Executive Gunmetal Titanium Steel & 24K Imperial Gold (Iconic Heavy Safe)
-      matChassisRef.current.color.setHex(0x4f5869);
-      matChassisRef.current.metalness = 0.85;
-      matChassisRef.current.roughness = 0.32;
-
-      matDoorRef.current.color.setHex(0x64748b);
-      matDoorRef.current.metalness = 0.88;
-      matDoorRef.current.roughness = 0.25;
-
-      matInsetRef.current.color.setHex(0xd4af37);
-      matInsetRef.current.metalness = 0.92;
-      matInsetRef.current.roughness = 0.20;
-
-      matWheelRef.current.color.setHex(0xf59e0b);
-      matWheelRef.current.metalness = 0.98;
-      matWheelRef.current.roughness = 0.08;
-
-      matChromeRef.current.color.setHex(0xffffff);
-      matChromeRef.current.metalness = 1.0;
-      matChromeRef.current.roughness = 0.03;
-    } else if (targetPreset === 'champagne-white') {
-      // 2. Brushed Platinum Stainless Steel & Champagne Gold
-      matChassisRef.current.color.setHex(0x718096);
-      matChassisRef.current.metalness = 0.82;
-      matChassisRef.current.roughness = 0.26;
-
-      matDoorRef.current.color.setHex(0x8a9ba8);
-      matDoorRef.current.metalness = 0.88;
-      matDoorRef.current.roughness = 0.20;
-
-      matInsetRef.current.color.setHex(0xeab308);
-      matInsetRef.current.metalness = 0.92;
-      matInsetRef.current.roughness = 0.18;
-
-      matWheelRef.current.color.setHex(0xf59e0b);
-      matWheelRef.current.metalness = 0.96;
-      matWheelRef.current.roughness = 0.08;
-
-      matChromeRef.current.color.setHex(0xffffff);
-      matChromeRef.current.metalness = 1.0;
-      matChromeRef.current.roughness = 0.03;
-    } else if (targetPreset === 'mirror-chrome') {
-      // 3. Aerospace Mirror Polished Chrome & Brushed Nickel (High-Tech Armored Safe)
-      matChassisRef.current.color.setHex(0x334155);
-      matChassisRef.current.metalness = 0.95;
-      matChassisRef.current.roughness = 0.18;
-
-      matDoorRef.current.color.setHex(0x94a3b8);
-      matDoorRef.current.metalness = 0.99;
-      matDoorRef.current.roughness = 0.10;
-
-      matInsetRef.current.color.setHex(0x475569);
-      matInsetRef.current.metalness = 0.85;
-      matInsetRef.current.roughness = 0.22;
-
-      matWheelRef.current.color.setHex(0xffffff);
-      matWheelRef.current.metalness = 0.99;
-      matWheelRef.current.roughness = 0.04;
-
-      matChromeRef.current.color.setHex(0xf59e0b);
-      matChromeRef.current.metalness = 0.96;
-      matChromeRef.current.roughness = 0.08;
-    }
-  }, []);
-
-  // Trigger combination wheel spin animation
+  // Trigger combination wheel spin animation on click
   const handleSpinDial = () => {
     setIsDialSpinning(true);
     setTimeout(() => setIsDialSpinning(false), 2400);
   };
 
-  // Toggle wireframe mode
-  const toggleWireframe = useCallback(() => {
-    setWireframeMode((prev) => {
-      const next = !prev;
-      const mats = [
-        matChassisRef.current,
-        matDoorRef.current,
-        matInsetRef.current,
-        matWheelRef.current,
-        matChromeRef.current,
-        matHingeRef.current,
-        matCoreRef.current,
-      ];
-      mats.forEach((m) => {
-        if (m) m.wireframe = next;
-      });
-      return next;
-    });
-  }, []);
-
   // Initialize Three.js Scene & Load safe_vault.glb
   useEffect(() => {
-    if (mode !== 'three' || prefersReduced) {
+    if (prefersReduced) {
       setIsLoading(false);
       return;
     }
@@ -200,7 +79,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     camera.position.set(0, 1.2, 7.2);
     camera.lookAt(0, -0.05, 0);
 
-    // 3. WebGL Renderer with ACES Filmic Tone Mapping & Controlled 1.0 Exposure
+    // 3. WebGL Renderer with ACES Filmic Tone Mapping & Controlled 1.05 Exposure
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -222,7 +101,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     scene.environment = envTexture;
 
     // 5. BALANCED FIVE-POINT STUDIO LIGHTING (Rich contrast, deep metallic shadows, zero chalk)
-    // A. Soft Ambient Base Light (0.85 intensity gives natural shadows)
+    // A. Soft Ambient Base Light
     const ambientLight = new THREE.AmbientLight(0xd5e0ec, 0.85);
     scene.add(ambientLight);
 
@@ -259,39 +138,33 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 
     // 6. ROOT TRANSFORMATION GROUP
     const rootGroup = new THREE.Group();
-    // Angle (Math.PI - 0.72) showcases the open door, 24K gold combination wheel, chrome locking pins, and illuminated interior
+    // Angle showcases the open door, 24K gold combination wheel, chrome locking pins, and illuminated interior
     rootGroup.rotation.x = 0.12;
     rootGroup.rotation.y = Math.PI - 0.72;
     rootGroupRef.current = rootGroup;
     scene.add(rootGroup);
 
-    // 7. PBR MATERIALS FOR AUTHENTIC HEAVY METALLIC VAULT
-    // A. Outer Armor Chassis (Deep Gunmetal Brushed Titanium Steel - Solid, heavy, non-white)
+    // 7. PBR MATERIALS FOR AUTHENTIC "GOLD & STEEL" VAULT
+    // A. Outer Armor Chassis (Deep Gunmetal Brushed Titanium Steel)
     const matChassis = new THREE.MeshStandardMaterial({
       color: 0x4f5869, // Heavy gunmetal steel
       metalness: 0.85,
       roughness: 0.32,
-      wireframe: wireframeMode,
     });
-    matChassisRef.current = matChassis as unknown as THREE.MeshPhysicalMaterial;
 
     // B. Vault Door Face Panel (Machined Titanium Plate)
     const matDoor = new THREE.MeshStandardMaterial({
       color: 0x64748b, // Brushed titanium plate
       metalness: 0.88,
       roughness: 0.25,
-      wireframe: wireframeMode,
     });
-    matDoorRef.current = matDoor as unknown as THREE.MeshPhysicalMaterial;
 
-    // C. Door Inset Accent Plate & Trim (Rich Brushed Imperial Gold)
+    // C. Door Inset Accent Plate & Trim (Rich Brushed 24K Imperial Gold)
     const matInset = new THREE.MeshStandardMaterial({
       color: 0xd4af37, // 24K Imperial Gold Plate
       metalness: 0.92,
       roughness: 0.20,
-      wireframe: wireframeMode,
     });
-    matInsetRef.current = matInset as unknown as THREE.MeshPhysicalMaterial;
 
     // D. 5-Spoke Combination Lock Wheel & Center Hub (Solid Polished 24K Pure Gold)
     const matWheel = new THREE.MeshPhysicalMaterial({
@@ -301,9 +174,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       reflectivity: 1.0,
-      wireframe: wireframeMode,
     });
-    matWheelRef.current = matWheel;
 
     // E. Heavy Locking Bolts & Hinge Pins (Mirror-Polished Hardened Chrome)
     const matChrome = new THREE.MeshPhysicalMaterial({
@@ -313,18 +184,14 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       clearcoat: 1.0,
       clearcoatRoughness: 0.02,
       reflectivity: 1.0,
-      wireframe: wireframeMode,
     });
-    matChromeRef.current = matChrome;
 
     // F. Heavy Hinge Blocks (Solid Forged Steel)
     const matHinge = new THREE.MeshStandardMaterial({
       color: 0x334155, // Forged dark steel
       metalness: 0.85,
       roughness: 0.35,
-      wireframe: wireframeMode,
     });
-    matHingeRef.current = matHinge as unknown as THREE.MeshPhysicalMaterial;
 
     // G. Biometric Optical Tumbler Core (Electric Cobalt Laser Scanner)
     const matCore = new THREE.MeshStandardMaterial({
@@ -333,9 +200,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       emissiveIntensity: 3.5,
       metalness: 0.5,
       roughness: 0.2,
-      wireframe: wireframeMode,
     });
-    matCoreRef.current = matCore;
 
     // --- SLEEK OBSIDIAN PRECISION STAGE (Clean, grounded, no blue dinner plate!) ---
     const pedestalGroup = new THREE.Group();
@@ -629,7 +494,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       matHinge.dispose();
       matCore.dispose();
     };
-  }, [mode, wireframeMode, prefersReduced]);
+  }, [prefersReduced]);
 
   return (
     <div
@@ -640,99 +505,13 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.12)_0%,rgba(45,104,255,0.08)_40%,transparent_70%)] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#2D68FF]/15 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Top Visual HUD Toolbar */}
-      <div className="absolute top-3 left-3 right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0E1A]/90 backdrop-blur-md border border-white/15 shadow-lg">
+      {/* Top Visual Badge (Clean, Minimal, No Control Bar) */}
+      <div className="absolute top-3 left-3 z-30 pointer-events-none">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0A0E1A]/90 backdrop-blur-md border border-white/15 shadow-lg">
           <Shield className="w-3.5 h-3.5 text-[#5A8BFF]" />
           <span className="text-[11px] font-mono text-[#F8F9FD] tracking-wider uppercase font-semibold">
-            {mode === 'three' ? 'APEX Executive Vault (Stainless Steel & Gold)' : 'Spline 3D Scene'}
+            APEX Executive Vault • 24K Gold & Brushed Steel
           </span>
-        </div>
-
-        {/* Action Controls & Preset Pickers */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#0A0E1A]/90 backdrop-blur-md border border-white/15 shadow-xl">
-          {mode === 'three' && (
-            <>
-              {/* Grading Preset 1: Platinum Stainless Steel & 24K Gold */}
-              <button
-                onClick={() => applyPreset('platinum-gold')}
-                title="Platinum Steel & 24K Gold Finish"
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                  preset === 'platinum-gold'
-                    ? 'bg-amber-500/25 text-amber-300 border border-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.3)] font-semibold'
-                    : 'text-[#858B9E] hover:text-white'
-                }`}
-              >
-                Gold & Steel
-              </button>
-
-              {/* Grading Preset 2: Champagne White & Gold */}
-              <button
-                onClick={() => applyPreset('champagne-white')}
-                title="Champagne White & Gold Finish (Swiss Safe)"
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                  preset === 'champagne-white'
-                    ? 'bg-white/25 text-white border border-white/40 shadow-[0_0_10px_rgba(255,255,255,0.3)] font-semibold'
-                    : 'text-[#858B9E] hover:text-white'
-                }`}
-              >
-                White & Gold
-              </button>
-
-              {/* Grading Preset 3: Mirror Chrome */}
-              <button
-                onClick={() => applyPreset('mirror-chrome')}
-                title="Mirror Chrome & Titanium Finish"
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                  preset === 'mirror-chrome'
-                    ? 'bg-[#2D68FF]/30 text-blue-300 border border-[#2D68FF]/50 shadow-[0_0_10px_rgba(45,104,255,0.4)] font-semibold'
-                    : 'text-[#858B9E] hover:text-white'
-                }`}
-              >
-                Chrome
-              </button>
-
-              <div className="w-px h-3.5 bg-white/15 mx-0.5" />
-
-              {/* Spin Combination Wheel Button */}
-              <button
-                onClick={handleSpinDial}
-                title="Click to Spin Vault Combination Wheel"
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                  isDialSpinning
-                    ? 'bg-amber-500/30 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
-                    : 'bg-[#2D68FF] text-white font-semibold shadow-[0_0_12px_rgba(45,104,255,0.5)] hover:bg-[#2555D6]'
-                }`}
-              >
-                <RefreshCw className={`w-3 h-3 ${isDialSpinning ? 'animate-spin' : ''}`} />
-                <span>Spin</span>
-              </button>
-
-              {/* Wireframe toggle */}
-              <button
-                onClick={toggleWireframe}
-                title="Toggle Wireframe Architecture"
-                className={`p-1.5 rounded-lg text-[10px] transition-colors cursor-pointer ${
-                  wireframeMode
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'text-[#858B9E] hover:text-white'
-                }`}
-              >
-                <Box className="w-3.5 h-3.5" />
-              </button>
-            </>
-          )}
-
-          <div className="w-px h-3.5 bg-white/15 mx-0.5" />
-
-          {/* Mode Switcher */}
-          <button
-            onClick={() => setMode(mode === 'three' ? 'spline' : 'three')}
-            title="Toggle between 3D Vault and Spline scene"
-            className="px-2 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider text-[#858B9E] hover:text-white transition-colors cursor-pointer"
-          >
-            {mode === 'three' ? 'Spline' : '3D Vault'}
-          </button>
         </div>
       </div>
 
@@ -750,37 +529,16 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
           </div>
         </div>
       ) : (
-        <>
-          {/* Mode 1: Three.js Interactive WebGL 3D Safe Vault */}
-          {mode === 'three' && (
-            <div
-              className="w-full h-full relative cursor-grab active:cursor-grabbing"
-              onClick={handleSpinDial}
-              title="Click and drag to rotate vault 360° • Click to spin gold combination wheel"
-            >
-              <canvas
-                ref={canvasRef}
-                className="w-full h-full block"
-              />
-            </div>
-          )}
-
-          {/* Mode 2: Spline Interactive Embed */}
-          {mode === 'spline' && (
-            <div className="w-full h-full relative">
-              <iframe
-                src={splineSceneUrl}
-                frameBorder="0"
-                width="100%"
-                height="100%"
-                className="w-full h-full border-0 pointer-events-auto"
-                title="Spline 3D Scene Embed"
-                loading="lazy"
-                onLoad={() => setIsLoading(false)}
-              />
-            </div>
-          )}
-        </>
+        <div
+          className="w-full h-full relative cursor-grab active:cursor-grabbing"
+          onClick={handleSpinDial}
+          title="Click and drag to rotate vault 360° • Click to spin 24K gold combination wheel"
+        >
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full block"
+          />
+        </div>
       )}
 
       {/* Loading Overlay */}
@@ -788,7 +546,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0D121F] gap-3">
           <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[#FBBF24] animate-spin shadow-[0_0_20px_#FBBF24]" />
           <div className="text-xs font-mono text-[#E2E8F0] tracking-widest uppercase">
-            Machining Stainless Steel & Gold Vault...
+            Machining Gold & Steel Vault...
           </div>
         </div>
       )}
@@ -801,7 +559,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         </div>
         <div className="flex items-center gap-2 text-[10px] font-mono text-[#FBBF24] bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#FBBF24]/40 shadow-[0_0_12px_rgba(251,191,36,0.3)] hidden sm:flex">
           <span className="w-1.5 h-1.5 rounded-full bg-[#FBBF24] animate-ping" />
-          <span>High-Contrast Steel & 24K Gold PBR</span>
+          <span>24K Gold & Brushed Steel PBR</span>
         </div>
       </div>
     </div>
@@ -809,4 +567,5 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 };
 
 export default Hero3DVisual;
+
 
