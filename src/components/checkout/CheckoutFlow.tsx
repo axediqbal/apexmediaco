@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { 
   ShieldCheck, 
@@ -258,10 +259,15 @@ export const CheckoutFlow: React.FC = () => {
     return (
       <div className="py-14 md:py-24">
         <Container size="md">
-          <GlassCard className="p-8 sm:p-12 text-center space-y-8" glow>
-            <div className="w-20 h-20 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-[0_0_35px_rgba(16,185,129,0.3)]">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+          >
+            <GlassCard className="p-8 sm:p-12 text-center space-y-8" glow>
+              <div className="w-20 h-20 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-[0_0_35px_rgba(16,185,129,0.3)]">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
 
             <div className="space-y-2">
               <span className="text-xs font-mono uppercase tracking-widest text-emerald-400">
@@ -347,8 +353,9 @@ export const CheckoutFlow: React.FC = () => {
               </Link>
             </div>
           </GlassCard>
-        </Container>
-      </div>
+        </motion.div>
+      </Container>
+    </div>
     );
   }
 
@@ -402,8 +409,16 @@ export const CheckoutFlow: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Left Column: Multi-Step Forms */}
           <div className="lg:col-span-7">
-            {step === 'shipping' && (
-              <GlassCard className="p-6 sm:p-8 space-y-6">
+            <AnimatePresence mode="wait">
+              {step === 'shipping' && (
+                <motion.div
+                  key="shipping"
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -24 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+                >
+                  <GlassCard className="p-6 sm:p-8 space-y-6">
                 <div>
                   <h2 className="text-xl font-bold text-[#F5F5F8] font-display">
                     Enterprise Shipping & Point of Contact
@@ -515,9 +530,17 @@ export const CheckoutFlow: React.FC = () => {
                   </div>
                 </form>
               </GlassCard>
-            )}
+            </motion.div>
+          )}
 
-            {step === 'logistics' && (
+          {step === 'logistics' && (
+            <motion.div
+              key="logistics"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+            >
               <GlassCard className="p-6 sm:p-8 space-y-6">
                 <div>
                   <h2 className="text-xl font-bold text-[#F5F5F8] font-display">
@@ -600,9 +623,17 @@ export const CheckoutFlow: React.FC = () => {
                   </Button>
                 </div>
               </GlassCard>
-            )}
+            </motion.div>
+          )}
 
-            {step === 'review' && (
+          {step === 'review' && (
+            <motion.div
+              key="review"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+            >
               <GlassCard className="p-6 sm:p-8 space-y-6">
                 <div>
                   <h2 className="text-xl font-bold text-[#F5F5F8] font-display">
@@ -725,8 +756,10 @@ export const CheckoutFlow: React.FC = () => {
                   </Button>
                 </div>
               </GlassCard>
-            )}
-          </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
           {/* Right Column: Sticky Order Summary (5 cols) */}
           <div className="lg:col-span-5">

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Star, 
   ShoppingBag, 
@@ -30,16 +31,16 @@ interface ProductDetailViewProps {
  * ProductDetailView — Interactive Collateral Kit Specification & Purchase View
  * 
  * KIYA HORAHA HAI (WHAT IT DOES):
- * - Displays high-resolution multi-angle studio photography with an interactive thumbnail switcher.
+ * - High-resolution studio photography with animated thumbnail and gallery transitions.
  * - Manages interactive variant selections (sizes, colorways, finish tiers).
  * - Enforces stock level guards (disables actions if stock is 0 and shows waitlist notice).
  * - Triggers animated Add-to-Cart with visual state transitions (Idle -> Adding -> Added ✓).
  * - Renders "What's Included in This Kit" bill of materials and related product recommendations.
  * 
  * KESE HORAHA HAI (HOW IT DOES IT):
- * 1. Tracks active gallery index, quantity counter with lower boundary clamping (min 1).
- * 2. Employs selectedVariants map initialized with the first option of each available variant.
- * 3. Dispatches item to CartContext and opens the sliding cart drawer automatically.
+ * 1. Framer motion page reveal and cross-fading gallery image swaps.
+ * 2. Variant selection and quantity stepper with lower boundary clamping.
+ * 3. Dispatches item to CartContext with animated drawer auto-trigger.
  */
 export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   product,
@@ -71,8 +72,12 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     }));
   };
 
+  const handleQuantityChange = (delta: number) => {
+    setQuantity((prev) => Math.max(1, Math.min(prev + delta, product.stock || 1)));
+  };
+
   const handleAddToCart = () => {
-    if (isOutOfStock || isAdding) return;
+    if (isOutOfStock) return;
 
     setIsAdding(true);
     setTimeout(() => {
@@ -84,15 +89,20 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   };
 
   return (
-    <div className="py-10 md:py-16 relative">
+    <motion.div 
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
+      className="py-10 md:py-16 relative"
+    >
       <Container size="xl">
         {/* Breadcrumb Navigation */}
         <div className="mb-8">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-xs font-mono text-[#A1A1B0] hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-mono text-[#A1A1B0] hover:text-white transition-colors group"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
             <span>Back to Collateral Catalog</span>
           </Link>
         </div>
@@ -101,13 +111,20 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
           {/* Left Column: Image Gallery (Col 7) */}
           <div className="lg:col-span-7 space-y-4">
-            {/* Primary Main Active Image */}
+            {/* Primary Main Active Image with Cross-fade Transition */}
             <div className="relative aspect-[16/11] rounded-3xl overflow-hidden bg-[#0D0D12] border border-white/[0.08] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-              <img
-                src={product.images[selectedImageIndex] || product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedImageIndex}
+                  src={product.images[selectedImageIndex] || product.images[0]}
+                  alt={product.name}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.28, ease: 'easeOut' }}
+                  className="w-full h-full object-cover"
+                />
+              </AnimatePresence>
 
               {/* Badges Overlay */}
               <div className="absolute top-4 left-4 flex items-center gap-2">
@@ -222,112 +239,158 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                 </div>
               </div>
 
-              {/* Variant Selectors */}
-              {product.variants?.map((variant) => (
-                <div key={variant.id} className="space-y-2.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-[#A1A1B0] uppercase font-mono">
-                      {variant.name}
+              {/* Dynamic Variant Selectors */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="space-y-4">
+                  {product.variants.map((v) => (
+                    <div key={v.id} className="space-y-2">
+                      <span className="text-xs font-mono text-[#A1A1B0] uppercase tracking-wider block">
+                        {v.name}: <span className="text-white font-bold">{selectedVariants[v.id]}</span>
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {v.options.map((opt) => {
+                          const isSelected = selectedVariants[v.id] === opt;
+                          return (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => handleVariantSelect(v.id, opt)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.4)]'
+                                  : 'bg-white/[0.02] border-white/10 text-[#A1A1B0] hover:border-white/30 hover:text-white'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Quantity Selector & Add Button */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-4">
+                  {/* Quantity Counter */}
+                  <div className="flex items-center rounded-xl border border-white/10 bg-white/[0.02] p-1">
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 1 || isOutOfStock}
+                      aria-label="Decrease quantity"
+                      className="p-2 rounded-lg hover:bg-white/10 text-[#A1A1B0] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-10 text-center font-mono text-sm font-bold text-white">
+                      {quantity}
                     </span>
-                    <span className="text-[#5A8BFF] font-medium font-mono">
-                      {selectedVariants[variant.id]}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(1)}
+                      disabled={quantity >= product.stock || isOutOfStock}
+                      aria-label="Increase quantity"
+                      className="p-2 rounded-lg hover:bg-white/10 text-[#A1A1B0] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {variant.options.map((option) => {
-                      const isSelected = selectedVariants[variant.id] === option;
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => handleVariantSelect(variant.id, option)}
-                          className={`text-xs py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer font-medium truncate ${
-                            isSelected
-                              ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.3)]'
-                              : 'bg-white/[0.03] border-white/10 text-[#A1A1B0] hover:text-white hover:border-white/20'
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {/* Add To Cart CTA with state transition */}
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    disabled={isOutOfStock || isAdding}
+                    onClick={handleAddToCart}
+                    className="flex-1 shadow-[0_0_25px_rgba(45,104,255,0.4)]"
+                    leftIcon={
+                      isAdded ? (
+                        <Check className="w-4 h-4 text-emerald-400" />
+                      ) : (
+                        <ShoppingBag className="w-4 h-4" />
+                      )
+                    }
+                  >
+                    {isAdding ? (
+                      'Allocating Kit...'
+                    ) : isAdded ? (
+                      'Added to Agency Cart!'
+                    ) : isOutOfStock ? (
+                      'Allocation Exhausted'
+                    ) : (
+                      `Add ${quantity} to Cart • $${(product.price * quantity).toLocaleString()}`
+                    )}
+                  </Button>
                 </div>
-              ))}
 
-              {/* Quantity Selector */}
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-xs font-semibold uppercase text-[#A1A1B0] font-mono">
-                  Order Quantity
-                </span>
-                <div className="flex items-center gap-2 bg-[#0E0E14] border border-white/10 rounded-xl p-1">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1 || isOutOfStock}
-                    aria-label="Decrease quantity"
-                    className="w-8 h-8 flex items-center justify-center text-[#A1A1B0] hover:text-[#F5F5F8] hover:bg-white/10 rounded-lg transition-colors disabled:opacity-40"
+                <Link href="/checkout" className="block">
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    className="w-full"
+                    onClick={() => {
+                      if (!isOutOfStock) {
+                        addToCart(product, quantity, selectedVariants);
+                      }
+                    }}
                   >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="w-8 text-center text-sm font-bold text-[#F5F5F8] font-mono">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    disabled={isOutOfStock}
-                    aria-label="Increase quantity"
-                    className="w-8 h-8 flex items-center justify-center text-[#A1A1B0] hover:text-[#F5F5F8] hover:bg-white/10 rounded-lg transition-colors disabled:opacity-40"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                    Direct PO Checkout
+                  </Button>
+                </Link>
               </div>
 
-              {/* Add to Cart CTA */}
-              <div className="pt-4 space-y-3">
-                <Button
-                  id="add-to-cart-btn"
-                  variant="primary"
-                  size="lg"
-                  disabled={isOutOfStock}
-                  isLoading={isAdding}
-                  onClick={handleAddToCart}
-                  className="w-full text-sm font-bold shadow-[0_0_35px_rgba(45,104,255,0.45)]"
-                  leftIcon={isAdded ? <Check className="w-4 h-4 text-emerald-400" /> : <ShoppingBag className="w-4 h-4" />}
-                >
-                  {isOutOfStock
-                    ? 'Waitlist Allocation Full'
-                    : isAdded
-                    ? 'Added to Collateral Cart ✓'
-                    : `Add to Collateral Cart — $${(product.price * quantity).toLocaleString()}`}
-                </Button>
-
-                <div className="grid grid-cols-2 gap-3 pt-2 text-[11px] text-[#71717A]">
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]">
-                    <Truck className="w-3.5 h-3.5 text-[#5A8BFF]" />
-                    <span>White-Glove Courier</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>NDA White-Label</span>
-                  </div>
+              {/* Guarantees */}
+              <div className="pt-4 border-t border-white/[0.08] grid grid-cols-2 gap-3 text-[11px] text-[#71717A]">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#5A8BFF]" />
+                  <span>White-Label NDA Protected</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-emerald-400" />
+                  <span>72-Hour Venue Delivery</span>
                 </div>
               </div>
             </GlassCard>
+
+            {/* Technical Specifications Sheet */}
+            {product.specs && Object.keys(product.specs).length > 0 && (
+              <GlassCard className="p-6 space-y-4">
+                <h3 className="text-sm font-bold text-[#F5F5F8] font-display uppercase tracking-wider">
+                  Fabrication & Technical Specifications
+                </h3>
+                <div className="divide-y divide-white/[0.06] text-xs">
+                  {Object.entries(product.specs).map(([key, val]) => (
+                    <div key={key} className="py-2.5 flex items-center justify-between">
+                      <span className="text-[#71717A] capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                      <span className="text-[#F5F5F8] font-mono text-right font-medium">{String(val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
           </div>
         </div>
 
         {/* Related Products Recommendation */}
         {relatedProducts.length > 0 && (
-          <div className="mt-24 pt-16 border-t border-white/[0.08]">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+            className="mt-24 pt-16 border-t border-white/[0.08]"
+          >
             <h2 className="text-xl sm:text-2xl font-bold text-[#F5F5F8] font-display mb-8">
               Complementary Agency Collateral
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedProducts.slice(0, 3).map((item) => (
-                <Link key={item.id} href={`/products/${item.slug || item.id}`} className="group block">
-                  <GlassCard className="p-4 h-full flex flex-col justify-between hover:border-[#2D68FF]/40 transition-all">
+                <Link key={item.id} href={`/products/${item.slug || item.id}`} className="group block h-full">
+                  <GlassCard className="p-5 h-full flex flex-col justify-between hover:border-[#2D68FF]/50 transition-all">
                     <div className="aspect-[16/10] rounded-xl overflow-hidden bg-[#0A0A0E] mb-3 border border-white/10">
                       <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     </div>
@@ -354,10 +417,10 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                 </Link>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
       </Container>
-    </div>
+    </motion.div>
   );
 };
 

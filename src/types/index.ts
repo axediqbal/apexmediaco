@@ -22,6 +22,7 @@ export interface ProductItem {
   badge?: string;
   sku: string;
   leadTime: string;
+  specs?: Record<string, string>;
 }
 
 export interface CartItem {
