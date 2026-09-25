@@ -94,7 +94,9 @@ export const RouteTransitionProvider: React.FC<{ children: React.ReactNode }> = 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname]);
 
-  // Animation variants
+  // Animation variants as requested:
+  // Purana page: fade+scale-out (opacity 1->0, scale 1->0.98)
+  // Naya page: immediately fade+scale-in (opacity 0->1, scale 0.98->1)
   const variants: Variants = useMemo(() => {
     if (prefersReduced) {
       return {
@@ -104,43 +106,40 @@ export const RouteTransitionProvider: React.FC<{ children: React.ReactNode }> = 
       };
     }
 
-    const slideDistance = isMobile ? 24 : 50;
-
     return {
-      enter: (dir: number) => ({
-        x: dir > 0 ? slideDistance : -slideDistance,
+      enter: {
         opacity: 0,
-      }),
+        scale: 0.98,
+      },
       center: {
-        x: 0,
         opacity: 1,
+        scale: 1,
         transition: {
-          x: { type: 'spring', damping: 28, stiffness: 220 },
-          opacity: { duration: isMobile ? 0.28 : 0.35, ease: [0.16, 1, 0.3, 1] as const },
+          duration: isMobile ? 0.22 : 0.28,
+          ease: [0.16, 1, 0.3, 1] as const,
         },
       },
-      exit: (dir: number) => ({
-        x: dir > 0 ? -slideDistance : slideDistance,
+      exit: {
         opacity: 0,
+        scale: 0.98,
         transition: {
-          x: { duration: isMobile ? 0.2 : 0.26, ease: [0.16, 1, 0.3, 1] as const },
-          opacity: { duration: isMobile ? 0.18 : 0.22, ease: [0.16, 1, 0.3, 1] as const },
+          duration: isMobile ? 0.18 : 0.24,
+          ease: [0.16, 1, 0.3, 1] as const,
         },
-      }),
+      },
     };
   }, [prefersReduced, isMobile]);
 
   return (
-    <div className="relative w-full flex-1 flex flex-col overflow-x-hidden">
-      <AnimatePresence mode="wait" initial={false} custom={direction}>
+    <div className="relative w-full flex-1 flex flex-col">
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={pathname}
-          custom={direction}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
-          className="flex-1 w-full flex flex-col will-change-[transform,opacity]"
+          className="w-full flex-1 flex flex-col will-change-[transform,opacity]"
         >
           <FrozenRoute>
             {children}

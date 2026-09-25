@@ -89,12 +89,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
-      className="py-10 md:py-16 relative"
-    >
+    <div className="py-10 md:py-16 relative">
       <Container size="xl">
         {/* Breadcrumb Navigation */}
         <div className="mb-8">
@@ -420,7 +415,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
           </motion.div>
         )}
       </Container>
-    </motion.div>
+    </div>
   );
 };
 

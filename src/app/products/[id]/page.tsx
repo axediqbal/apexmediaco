@@ -31,6 +31,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const products = await fetchProducts();
+  return products.map((p) => ({
+    id: p.slug,
+  }));
+}
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { id } = await params;
   const product = await fetchProductById(id);
