@@ -49,37 +49,40 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       onMouseLeave={handlePointerLeave}
       className={twMerge(
         clsx(
-          'relative rounded-2xl overflow-hidden',
-          'bg-gradient-to-b from-[#181822]/80 to-[#0E0E14]/90',
-          'backdrop-blur-xl saturate-[165%]',
-          'border border-white/[0.08]',
-          hoverEffect &&
-            'transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#2D68FF]/50 hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8),0_0_30px_-5px_rgba(45,104,255,0.25)]',
-          glow && 'shadow-[0_0_40px_-5px_rgba(45,104,255,0.35)] border-[#2D68FF]/40',
+          'relative rounded-2xl p-[1px] overflow-hidden group/card',
+          'transition-all duration-300 ease-out',
+          hoverEffect && 'hover:-translate-y-1 hover:shadow-[0_24px_60px_-10px_rgba(0,0,0,0.85),0_0_35px_-5px_rgba(45,104,255,0.3)]',
+          glow && 'shadow-[0_0_40px_-5px_rgba(45,104,255,0.35)]',
           className
         )
       )}
       {...props}
     >
-      {/* Dynamic Cursor Spotlight Border Glow */}
+      {/* Background Static Border Foundation */}
+      <div className="absolute inset-0 rounded-2xl bg-white/[0.08] transition-colors group-hover/card:bg-white/[0.12] pointer-events-none" />
+
+      {/* Dynamic Cursor Spotlight Radial Border Glow (No Milky Interior Haze) */}
       {spotlight && (
         <div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300"
           style={{
             opacity: mousePos.opacity,
-            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(45, 104, 255, 0.22), transparent 70%)`,
+            background: `radial-gradient(450px circle at ${mousePos.x}px ${mousePos.y}px, rgba(45, 104, 255, 0.65), transparent 60%)`,
           }}
         />
       )}
 
-      {/* Specular top highlight */}
-      {specular && (
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
-      )}
-      
-      {/* Subtle safety contrast scrim */}
-      <div className="relative z-10 w-full h-full">
-        {children}
+      {/* Deep Obsidian Inner Card Body */}
+      <div className="relative z-10 w-full h-full rounded-[15px] bg-gradient-to-b from-[#11131C] to-[#0A0B10] backdrop-blur-xl saturate-[160%] overflow-hidden">
+        {/* Specular top hairline highlight */}
+        {specular && (
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+        )}
+
+        {/* Card Content with Contrast Scrim */}
+        <div className="relative z-10 w-full h-full">
+          {children}
+        </div>
       </div>
     </div>
   );

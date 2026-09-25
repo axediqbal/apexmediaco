@@ -1,90 +1,120 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: var(--font-display), 'Space Grotesk', system-ui, sans-serif;
+  --font-sans: var(--font-sans), 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 @layer base {
   :root {
-    /* Custom OKLCH Color Scale */
-    --bg-obsidian: oklch(0.12 0.01 260);         /* #0A0A0C */
-    --bg-surface: oklch(0.16 0.015 260);        /* #121217 */
-    --bg-card: oklch(0.20 0.02 260);            /* #181822 */
-    --bg-elevated: oklch(0.24 0.025 260);        /* #22222E */
+    /* Custom Luxury Studio Color Palette */
+    --bg-obsidian: #08090D;
+    --bg-surface: #0E1017;
+    --bg-card: #131520;
+    --bg-elevated: #1A1D2B;
     
-    /* Electric Cobalt Blue Accent Tokens */
-    --accent-cobalt: oklch(0.58 0.24 260);       /* #2D68FF */
-    --accent-cobalt-light: oklch(0.68 0.22 255); /* #5A8BFF */
-    --accent-cobalt-deep: oklch(0.40 0.20 260);  /* #1A42AA */
-    --accent-cobalt-glow: rgba(45, 104, 255, 0.35);
+    /* Precision Electric Cobalt Blue Tokens */
+    --accent-cobalt: #2D68FF;
+    --accent-cobalt-light: #5A8BFF;
+    --accent-cobalt-deep: #163FB8;
+    --accent-cobalt-glow: rgba(45, 104, 255, 0.4);
     
-    /* Neutral & Text Scale */
-    --text-primary: oklch(0.98 0.005 260);       /* High contrast white */
-    --text-secondary: oklch(0.75 0.015 260);     /* Soft silver */
-    --text-muted: oklch(0.55 0.02 260);          /* Dim charcoal */
+    /* Titanium & Silver Text Hierarchy */
+    --text-primary: #F8F9FD;       /* High-contrast crisp white */
+    --text-secondary: #9FA5B9;     /* Cool architectural silver */
+    --text-muted: #69708A;         /* Subdued metadata slate */
     
-    /* Border & Specular Highlights */
-    --border-subtle: rgba(255, 255, 255, 0.07);
-    --border-glass: rgba(255, 255, 255, 0.12);
-    --border-specular: rgba(255, 255, 255, 0.25);
-    --border-accent: rgba(45, 104, 255, 0.5);
+    /* Specular Borders */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-glass: rgba(255, 255, 255, 0.10);
+    --border-specular: rgba(255, 255, 255, 0.22);
+    --border-accent: rgba(45, 104, 255, 0.45);
 
-    /* Custom Radius Scale */
+    /* Radius Rhythm */
     --radius-sm: 8px;
     --radius-md: 14px;
     --radius-lg: 22px;
     --radius-xl: 32px;
-
-    /* Custom Shadows */
-    --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
-    --shadow-floating: 0 24px 60px -12px rgba(0, 0, 0, 0.8), 0 0 35px -5px rgba(45, 104, 255, 0.2);
-    --shadow-glow: 0 0 50px -5px rgba(45, 104, 255, 0.4);
   }
 
   body {
-    background-color: #0A0A0C;
+    background-color: #07080B;
     background-image: 
-      radial-gradient(at 15% 15%, rgba(45, 104, 255, 0.07) 0px, transparent 50%),
-      radial-gradient(at 85% 75%, rgba(45, 104, 255, 0.05) 0px, transparent 60%);
+      radial-gradient(ellipse 90% 60% at 50% -10%, rgba(45, 104, 255, 0.12) 0%, transparent 70%),
+      radial-gradient(circle 800px at 10% 40%, rgba(45, 104, 255, 0.05) 0%, transparent 60%),
+      radial-gradient(circle 900px at 90% 70%, rgba(45, 104, 255, 0.04) 0%, transparent 65%);
     background-attachment: fixed;
     color: var(--text-primary);
-    font-family: var(--font-sans, system-ui, sans-serif);
+    font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
     min-height: 100vh;
     overflow-x: hidden;
-    selection-background-color: rgba(45, 104, 255, 0.35);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: rgba(45, 104, 255, 0.4);
+    background: rgba(45, 104, 255, 0.45);
     color: #ffffff;
   }
 
   /* Accessible visible focus states */
   *:focus-visible {
     outline: none !important;
-    box-shadow: 0 0 0 2px #0A0A0C, 0 0 0 4px #2D68FF !important;
+    box-shadow: 0 0 0 2px #07080B, 0 0 0 4px #2D68FF !important;
   }
+
+  /* Custom Sleek Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #07080B;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1B1E2B;
+    border-radius: 9999px;
+    border: 2px solid #07080B;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2D68FF;
+  }
+}
+
+/* Explicit Typography Helpers */
+.font-display {
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  letter-spacing: -0.025em;
+}
+
+.font-sans {
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
 }
 
 /* Glassmorphism 2.0 Utilities */
 .glass-panel {
-  background: rgba(16, 16, 22, 0.75);
-  backdrop-filter: blur(18px) saturate(175%);
-  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  background: rgba(14, 16, 23, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.55);
 }
 
 .glass-nav {
-  background: rgba(10, 10, 12, 0.82);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(8, 9, 13, 0.85);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(24, 24, 34, 0.7) 0%, rgba(14, 14, 20, 0.8) 100%);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  background: linear-gradient(145deg, rgba(19, 21, 32, 0.85) 0%, rgba(11, 13, 19, 0.95) 100%);
+  backdrop-filter: blur(18px) saturate(165%);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
@@ -96,53 +126,63 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
   pointer-events: none;
 }
 
 .glass-card:hover {
-  border-color: rgba(45, 104, 255, 0.4);
-  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px -8px rgba(45, 104, 255, 0.3);
+  border-color: rgba(45, 104, 255, 0.45);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 35px -5px rgba(45, 104, 255, 0.3);
   transform: translateY(-3px);
 }
 
 .glass-drawer {
-  background: rgba(12, 12, 16, 0.88);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  background: rgba(10, 11, 16, 0.92);
+  backdrop-filter: blur(28px) saturate(195%);
+  -webkit-backdrop-filter: blur(28px) saturate(195%);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
-}
-
-/* Subtle noise grain simulation */
-.bg-noise {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
-  background-size: 24px 24px;
+  box-shadow: -25px 0 70px rgba(0, 0, 0, 0.85);
 }
 
 /* Fluid Typography Clamp Utilities */
 .text-display-hero {
-  font-family: var(--font-display, system-ui, sans-serif);
-  font-size: clamp(2.5rem, 6vw + 1rem, 5.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  font-size: clamp(2.5rem, 6.5vw + 0.5rem, 5.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
   font-weight: 800;
 }
 
 .text-display-title {
-  font-family: var(--font-display, system-ui, sans-serif);
-  font-size: clamp(1.75rem, 3.5vw + 0.5rem, 3.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  font-size: clamp(1.85rem, 3.8vw + 0.3rem, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   font-weight: 700;
 }
 
 .text-display-section {
-  font-family: var(--font-display, system-ui, sans-serif);
-  font-size: clamp(1.35rem, 2.2vw + 0.3rem, 2.25rem);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  font-size: clamp(1.4rem, 2.4vw + 0.2rem, 2.35rem);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
   font-weight: 600;
+}
+
+/* Studio Photography Treatment */
+.studio-image-frame {
+  position: relative;
+  overflow: hidden;
+  background-color: #0A0B10;
+}
+
+.studio-image-frame img {
+  filter: contrast(106%) brightness(96%) saturate(108%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+}
+
+.studio-image-frame:hover img {
+  filter: contrast(110%) brightness(102%) saturate(115%);
 }
 
 /* Glow & Specular utilities */

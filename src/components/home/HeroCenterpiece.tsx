@@ -169,20 +169,20 @@ export const HeroCenterpiece: React.FC = () => {
       </div>
 
       {/* Orbiting Satellite Card 1: Rapid Deployment */}
-      <div className="hidden sm:flex absolute -bottom-6 -left-6 z-20 items-center gap-3 p-3.5 rounded-2xl bg-[#0E0E14]/90 backdrop-blur-xl border border-white/15 shadow-[0_15px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(45,104,255,0.2)] animate-bounce duration-[4000ms]">
-        <div className="p-2 rounded-xl bg-[#2D68FF]/20 text-[#5A8BFF] border border-[#2D68FF]/40">
-          <Box className="w-5 h-5" />
+      <div className="hidden sm:flex absolute -bottom-5 -left-5 z-20 items-center gap-3 p-3.5 rounded-2xl bg-[#0B0D14]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_40px_rgba(0,0,0,0.9),0_0_25px_rgba(45,104,255,0.25)] transition-transform duration-300 hover:scale-105">
+        <div className="p-2.5 rounded-xl bg-[#2D68FF]/20 text-[#5A8BFF] border border-[#2D68FF]/40 shadow-[0_0_15px_rgba(45,104,255,0.3)]">
+          <Box className="w-4 h-4" />
         </div>
         <div>
-          <span className="text-xs font-bold text-[#F5F5F8] block">72h White-Glove Dispatch</span>
-          <span className="text-[10px] text-[#A1A1B0]">Direct to Venue or Headquarters</span>
+          <span className="text-xs font-bold text-[#F8F9FD] block font-mono">72h White-Glove Dispatch</span>
+          <span className="text-[10px] text-[#9FA5B9]">Direct to Venue or Headquarters</span>
         </div>
       </div>
 
       {/* Orbiting Satellite Card 2: Certified Production */}
-      <div className="hidden sm:flex absolute -top-4 -right-4 z-20 items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#0E0E14]/90 backdrop-blur-xl border border-emerald-500/30 shadow-xl">
-        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-        <span className="text-xs font-mono font-medium text-emerald-300">
+      <div className="hidden sm:flex absolute -top-4 -right-4 z-20 items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0B0D14]/95 backdrop-blur-2xl border border-[#2D68FF]/40 shadow-[0_15px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(45,104,255,0.2)]">
+        <span className="w-2 h-2 rounded-full bg-[#5A8BFF] shadow-[0_0_8px_#2D68FF] animate-pulse" />
+        <span className="text-xs font-mono font-medium text-[#F8F9FD]">
           Client Proof Approved
         </span>
       </div>

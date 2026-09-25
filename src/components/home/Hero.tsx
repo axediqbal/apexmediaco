@@ -40,10 +40,10 @@ export const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-display-hero text-[#F5F5F8]"
+              className="text-display-hero text-[#F8F9FD] tracking-tight"
             >
               ENGINEERED <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#94B3FF] to-[#2D68FF]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#94B3FF] to-[#2D68FF] drop-shadow-[0_0_40px_rgba(45,104,255,0.4)]">
                 COLLATERAL
               </span> <br />
               FOR LEADERS.
@@ -54,7 +54,7 @@ export const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-base sm:text-lg text-[#A1A1B0] max-w-xl font-normal leading-relaxed"
+              className="text-base sm:text-lg text-[#9FA5B9] max-w-xl font-normal leading-relaxed"
             >
               We replace cheap throwaway promotional swag with precision-fabricated executive apparel kits, modular keynote event systems, and aerospace-grade client onboarding vaults.
             </motion.p>

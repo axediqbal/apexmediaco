@@ -50,7 +50,7 @@ export const Navbar: React.FC = () => {
       </div>
 
       <Container size="xl">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Brand Logo */}
           <Link
             href="/"
