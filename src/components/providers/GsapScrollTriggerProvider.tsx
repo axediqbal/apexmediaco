@@ -69,6 +69,21 @@ function splitWordsPreservingFormatting(element: HTMLElement): HTMLElement[] {
         words.push(elem);
         return;
       }
+      // If element has bg-clip-text or text-transparent, treat it atomically
+      // to prevent inner inline-block wrapper from breaking background-clip: text
+      if (
+        elem.classList.contains('bg-clip-text') ||
+        elem.classList.contains('text-transparent') ||
+        elem.style.webkitBackgroundClip === 'text'
+      ) {
+        const wrapper = document.createElement('span');
+        wrapper.className = 'inline-block overflow-hidden align-top mr-[0.2em]';
+        elem.parentNode?.insertBefore(wrapper, elem);
+        wrapper.appendChild(elem);
+        elem.classList.add('gsap-word', 'will-change-transform');
+        words.push(elem);
+        return;
+      }
       Array.from(elem.childNodes).forEach(processNode);
     }
   }

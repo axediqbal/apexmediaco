@@ -13,7 +13,7 @@ import ParticleConstellation from '@/components/canvas/ParticleConstellation';
 
 export const Hero: React.FC = () => {
   return (
-    <section className="relative w-full pt-8 pb-16 md:pt-14 md:pb-24 overflow-hidden">
+    <section data-gsap-skip="true" className="relative w-full pt-8 pb-16 md:pt-14 md:pb-24 overflow-hidden">
       {/* Interactive Hardware-Accelerated Particle Constellation */}
       <ParticleConstellation className="opacity-75" />
 
@@ -43,7 +43,7 @@ export const Hero: React.FC = () => {
               className="text-display-hero text-[#F8F9FD] tracking-tight"
             >
               ENGINEERED <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#94B3FF] to-[#2D68FF] drop-shadow-[0_0_40px_rgba(45,104,255,0.4)]">
+              <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-[#94B3FF] to-[#2D68FF] drop-shadow-[0_0_40px_rgba(45,104,255,0.4)]">
                 COLLATERAL
               </span> <br />
               FOR LEADERS.
