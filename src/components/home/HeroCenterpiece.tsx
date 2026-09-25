@@ -45,13 +45,13 @@ export const HeroCenterpiece: React.FC = () => {
 
   const activeKitData = {
     '3d-core': {
-      name: 'APEX Spatial Core & 3D Monolith',
-      subtitle: 'Aerospace-Grade Obsidian Geometry with Resonant Gyroscope',
-      price: 'Custom Spec',
-      badge: 'Interactive 3D Engine',
-      leadTime: 'Realtime WebGL',
-      metric: '60 FPS Hardware Render',
-      image: '/images/agency/ai-creative-lab.jpg',
+      name: 'APEX VIP Onboarding Vault (3D Model)',
+      subtitle: 'Aerospace-Grade 6061-T6 Milled Chassis with Pneumatic Damper & Biometric Lock',
+      price: '$620 USD',
+      badge: 'Interactive 3D Vault',
+      leadTime: '4-6 Days',
+      metric: '0.05mm CNC Precision',
+      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1000&q=80',
     },
     vault: {
       name: 'APEX VIP Onboarding Vault',
@@ -119,7 +119,7 @@ export const HeroCenterpiece: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#2D68FF] animate-pulse" />
             <span className="text-[11px] font-mono uppercase tracking-wider text-[#A1A1B0]">
-              {activeTab === '3d-core' ? '★ APEX 3D Spatial Visual' : 'Interactive Showcase'}
+              {activeTab === '3d-core' ? '★ 3D Milled VIP Vault' : 'Interactive Showcase'}
             </span>
           </div>
 
@@ -135,7 +135,7 @@ export const HeroCenterpiece: React.FC = () => {
                     : 'text-[#71717A] hover:text-[#F5F5F8]'
                 }`}
               >
-                {tab === '3d-core' ? '★ 3D Shape' : tab}
+                {tab === '3d-core' ? '★ 3D Vault' : tab}
               </button>
             ))}
           </div>
