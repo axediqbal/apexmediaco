@@ -1,8 +1,17 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, Star, ShoppingBag, Check, RotateCcw, Sparkles } from 'lucide-react';
+import { 
+  Search, 
+  SlidersHorizontal, 
+  Star, 
+  ShoppingBag, 
+  Check, 
+  RotateCcw, 
+  Sparkles, 
+  Eye 
+} from 'lucide-react';
 import { ProductItem } from '@/types';
 import { useCart } from '@/context/CartContext';
 import Container from '@/components/ui/Container';
@@ -11,12 +20,24 @@ import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import QuickSpecDrawer from '@/components/products/QuickSpecDrawer';
-import { Eye } from 'lucide-react';
 
 interface ProductCatalogProps {
   initialProducts: ProductItem[];
 }
 
+/**
+ * ProductCatalog — Filterable & Searchable Agency Collateral Index
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Displays the full collateral kit catalog with real-time keyword search, category filtering, and sorting.
+ * - Supports one-click quick-spec technical inspection drawers and direct quick-add actions.
+ * - Handles empty states with a one-click filter reset.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Uses React useMemo to compute filtered and sorted products instantly without page reloads.
+ * 2. Matches search terms against name, tagline, description, and category.
+ * 3. Mounts QuickSpecDrawer conditionally when a kit is selected for inspection.
+ */
 export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts }) => {
   const { addToCart } = useCart();
   const [search, setSearch] = useState('');

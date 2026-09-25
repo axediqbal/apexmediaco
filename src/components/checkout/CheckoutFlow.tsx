@@ -1,26 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 import { 
   ShieldCheck, 
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
-  AlertCircle, 
   CreditCard, 
   FileText, 
-  Truck, 
   ShoppingBag, 
   Printer, 
   Building2, 
   Mail, 
   User, 
   MapPin, 
-  Phone,
-  Clock
+  Phone
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { OrderRecord, CustomerInfo } from '@/types';
@@ -31,8 +27,25 @@ import Button from '@/components/ui/Button';
 
 type CheckoutStep = 'shipping' | 'logistics' | 'review' | 'confirmed';
 
+/**
+ * CheckoutFlow — Multi-Step Enterprise Collateral Checkout System
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Guides corporate clients through a 3-step checkout sequence:
+ *   1. Shipping & Enterprise Contact Coordinates
+ *   2. Logistics Speed & White-Glove Courier Selection
+ *   3. Payment & Purchase Order (PO) Review
+ *   4. Order Authorization & Confirmation (with milestone timeline)
+ * - Guards against empty cart checkout attempts.
+ * - Performs real-time client-side validation with inline error highlights.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Maintains active step state ('shipping' | 'logistics' | 'review' | 'confirmed').
+ * 2. Validates email regex, missing fields, and postal formats prior to step advance.
+ * 3. Submits serialized payload to Next.js API route /api/orders.
+ * 4. Triggers celebratory confetti upon success and displays printable receipt.
+ */
 export const CheckoutFlow: React.FC = () => {
-  const router = useRouter();
   const { cart, subtotal, shipping, tax, total, clearCart } = useCart();
 
   const [step, setStep] = useState<CheckoutStep>('shipping');

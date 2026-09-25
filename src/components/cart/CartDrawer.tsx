@@ -1,13 +1,26 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import React, { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import Button from '@/components/ui/Button';
 
+/**
+ * CartDrawer — Slide-over Glassmorphic Shopping Cart Panel
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Displays active collateral items selected for ordering.
+ * - Allows adjusting quantities (+ / -) or removing items with instant visual feedback.
+ * - Calculates running totals (subtotal, insured shipping rules, production tax).
+ * - Provides direct route transition to /checkout.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Subscribes to CartContext state.
+ * 2. Locks body scroll when isOpen=true to prevent background page scrolling.
+ * 3. Listens for 'Escape' key presses and backdrop clicks to close smoothly.
+ * 4. Displays formatted USD pricing and empty-state recommendations.
+ */
 export const CartDrawer: React.FC = () => {
   const router = useRouter();
   const {

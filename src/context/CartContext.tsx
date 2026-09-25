@@ -1,8 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { ProductItem, CartItem } from '@/types';
 
+/**
+ * Interface defining the Cart Context shape.
+ */
 interface CartContextType {
   cart: CartItem[];
   isOpen: boolean;
@@ -22,6 +25,10 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+/**
+ * Generates a deterministic string key from a variant dictionary.
+ * Ensures items with different options (e.g. Size M vs Size L) are treated as distinct cart rows.
+ */
 function getVariantKey(variants: Record<string, string> = {}): string {
   return Object.entries(variants)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -29,12 +36,26 @@ function getVariantKey(variants: Record<string, string> = {}): string {
     .join('|');
 }
 
+/**
+ * CartProvider — Global Cart State & Storage Engine
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Manages shopping cart line-items, quantities, and selected variant configurations.
+ * - Controls the slide-in visibility of the glassmorphic cart drawer.
+ * - Automatically computes financial totals (subtotal, insured freight rules, production tax).
+ * - Syncs cart items to browser localStorage so items persist on refresh.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Initializes with an empty cart and hydrates from localStorage only after mount (prevents SSR mismatch).
+ * 2. Provides memoized financial calculations to prevent redundant re-renders.
+ * 3. Encapsulates atomic add/update/remove methods with boundary guards (min 1 quantity).
+ */
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Hydrate from localStorage
+  // 1. Hydrate state from localStorage safely after client mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('apex_cart');
@@ -42,32 +63,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCart(JSON.parse(saved));
       }
     } catch (e) {
-      console.warn('Failed to load cart from storage:', e);
+      console.warn('[APEX Cart] Failed to read cart from localStorage:', e);
     } finally {
       setIsHydrated(true);
     }
   }, []);
 
-  // Save to localStorage
+  // 2. Persist state changes back to localStorage
   useEffect(() => {
     if (!isHydrated) return;
     try {
       localStorage.setItem('apex_cart', JSON.stringify(cart));
     } catch (e) {
-      console.warn('Failed to save cart to storage:', e);
+      console.warn('[APEX Cart] Failed to save cart to localStorage:', e);
     }
   }, [cart, isHydrated]);
 
-  const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
-  const toggleCart = () => setIsOpen((prev) => !prev);
+  // Drawer visibility toggles
+  const openCart = useCallback(() => setIsOpen(true), []);
+  const closeCart = useCallback(() => setIsOpen(false), []);
+  const toggleCart = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  const addToCart = (
+  // Add product to cart with chosen or default variants
+  const addToCart = useCallback((
     product: ProductItem,
     quantity: number = 1,
     selectedVariants: Record<string, string> = {}
   ) => {
-    // If no variants specified, use default first options
     const finalVariants = { ...selectedVariants };
     if (Object.keys(finalVariants).length === 0 && product.variants?.length) {
       product.variants.forEach((v) => {
@@ -96,18 +118,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
 
     setIsOpen(true);
-  };
+  }, []);
 
-  const removeFromCart = (productId: string, selectedVariants: Record<string, string> = {}) => {
+  // Remove specific variant line-item from cart
+  const removeFromCart = useCallback((productId: string, selectedVariants: Record<string, string> = {}) => {
     const targetKey = getVariantKey(selectedVariants);
     setCart((prev) =>
       prev.filter(
         (item) => !(item.product.id === productId && getVariantKey(item.selectedVariants) === targetKey)
       )
     );
-  };
+  }, []);
 
-  const updateQuantity = (
+  // Adjust item quantity with automatic removal at 0
+  const updateQuantity = useCallback((
     productId: string,
     quantity: number,
     selectedVariants: Record<string, string> = {}
@@ -126,17 +150,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return item;
       })
     );
-  };
+  }, [removeFromCart]);
 
-  const clearCart = () => {
+  // Clear all items (e.g. on successful checkout authorization)
+  const clearCart = useCallback(() => {
     setCart([]);
-  };
+  }, []);
 
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const shipping = subtotal > 0 ? (subtotal > 1500 ? 0 : 45) : 0;
-  const tax = Math.round(subtotal * 0.0825);
-  const total = subtotal + shipping + tax;
+  // Financial calculations memoized for performance
+  const totalItems = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
+  const subtotal = useMemo(() => cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0), [cart]);
+  const shipping = useMemo(() => (subtotal > 0 ? (subtotal >= 1500 ? 0 : 45) : 0), [subtotal]);
+  const tax = useMemo(() => Math.round(subtotal * 0.0825), [subtotal]);
+  const total = useMemo(() => subtotal + shipping + tax, [subtotal, shipping, tax]);
 
   return (
     <CartContext.Provider
@@ -162,6 +188,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Hook to consume CartContext with safety error boundary.
+ */
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) {

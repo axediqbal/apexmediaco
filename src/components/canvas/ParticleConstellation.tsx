@@ -12,12 +12,30 @@ interface Particle {
   baseAlpha: number;
 }
 
+/**
+ * ParticleConstellation — Hardware-Accelerated Interactive Canvas
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Renders a background constellation of floating particles in deep obsidian space.
+ * - When particles approach one another, draws glowing Electric Cobalt link filaments.
+ * - Responds to the user's cursor: particles gently repel from the pointer to create an organic, reactive wave.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Initializes an HTML5 <canvas> element sized to the full container bounding rect.
+ * 2. Spawns particle objects with random (X, Y) positions, subtle velocity vectors, and base opacities.
+ * 3. On every requestAnimationFrame tick:
+ *    - Updates particle coordinates and wraps them seamlessly around window bounds.
+ *    - Calculates Euclidean distance to cursor; applies a proportional repulsion vector force.
+ *    - Calculates pairwise Euclidean distances between particles; draws connecting filaments if distance < 110px.
+ * 4. Checks `usePrefersReducedMotion()`: automatically unmounts and disables canvas rendering if user prefers reduced motion for accessibility.
+ */
 export const ParticleConstellation: React.FC<{ className?: string }> = ({ className }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef<{ x: number; y: number; active: boolean }>({ x: -1000, y: -1000, active: false });
   const prefersReduced = usePrefersReducedMotion();
 
   useEffect(() => {
+    // Accessibility guard: respect user's system preferences
     if (prefersReduced) return;
 
     const canvas = canvasRef.current;
@@ -37,8 +55,8 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
 
     window.addEventListener('resize', handleResize);
 
-    // Particle density proportional to screen area
-    const particleCount = Math.floor((width * height) / 14000);
+    // Dynamic particle density tuned for performance (~1 particle per 14k pixels)
+    const particleCount = Math.min(80, Math.floor((width * height) / 14000));
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
@@ -65,7 +83,7 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
       mouseRef.current.active = false;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
 
     const maxDistance = 110;
@@ -74,21 +92,21 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw and update particles
+      // 1. Update and draw individual particle nodes
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Move
+        // Kinematic position update
         p.x += p.vx;
         p.y += p.vy;
 
-        // Wrap boundaries
+        // Torus wrap-around boundary logic
         if (p.x < 0) p.x = width;
         if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
         if (p.y > height) p.y = 0;
 
-        // Mouse physics interaction
+        // Pointer repulsion physics
         if (mouseRef.current.active) {
           const dx = mouseRef.current.x - p.x;
           const dy = mouseRef.current.y - p.y;
@@ -101,7 +119,7 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
           }
         }
 
-        // Render particle dot
+        // Render point with soft glow
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(90, 139, 255, ${p.baseAlpha})`;
@@ -109,7 +127,7 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
         ctx.shadowBlur = 6;
         ctx.fill();
 
-        // Connect nearby particles
+        // 2. Pairwise link filaments
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
@@ -147,9 +165,10 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className={`absolute inset-0 w-full h-full pointer-events-none z-0 ${className || ''}`}
     />
   );
 };
 
-export default ParticleConstellation;
+export default React.memo(ParticleConstellation);

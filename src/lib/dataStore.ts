@@ -4,10 +4,24 @@ import { Order } from '@/models/Order';
 import { SEED_PRODUCTS } from '@/data/seedData';
 import { ProductItem, OrderRecord } from '@/types';
 
-// In-memory fallback stores (active when MONGODB_URI is absent or offline)
+/**
+ * In-memory fallback stores (active when MONGODB_URI is absent or offline).
+ * Pre-seeded with realistic APEX MEDIA CO agency collateral kits.
+ */
 let inMemoryProducts: ProductItem[] = [...SEED_PRODUCTS];
 const inMemoryOrders: OrderRecord[] = [];
 
+/**
+ * seedProducts — Seeds or re-seeds the catalog with APEX collateral kits.
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Checks if the database or in-memory store contains products; if empty (or if force=true), inserts seed products.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Checks active database connection mode via connectToDatabase().
+ * 2. In MongoDB mode: uses Mongoose Product.countDocuments() and insertMany().
+ * 3. In fallback mode: populates inMemoryProducts array.
+ */
 export async function seedProducts(force: boolean = false): Promise<{ count: number; mode: string }> {
   const { isConnected, mode } = await connectToDatabase();
 
@@ -17,7 +31,6 @@ export async function seedProducts(force: boolean = false): Promise<{ count: num
       if (force) {
         await Product.deleteMany({});
       }
-      // Insert seed products mapping id to sku or custom identifier
       const docs = SEED_PRODUCTS.map((p) => ({
         ...p,
         _id: undefined
@@ -35,6 +48,16 @@ export async function seedProducts(force: boolean = false): Promise<{ count: num
   }
 }
 
+/**
+ * fetchProducts — Retrieves products with optional filtering and sorting.
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Returns a list of collateral kits filtered by category and search keyword, sorted by price or rating.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Queries MongoDB via Mongoose with dynamic regex queries when connected.
+ * 2. If MongoDB is offline or empty, executes identical filtering in memory against inMemoryProducts.
+ */
 export async function fetchProducts(filters?: {
   category?: string;
   search?: string;
@@ -77,7 +100,6 @@ export async function fetchProducts(filters?: {
           id: doc._id?.toString() || doc.id || doc.sku
         }));
       } else {
-        // Auto-seed if empty
         await seedProducts();
         const recheck = await Product.find(query).lean();
         products = recheck.map((doc: any) => ({
@@ -93,7 +115,7 @@ export async function fetchProducts(filters?: {
     products = [...inMemoryProducts];
   }
 
-  // Filter in memory if needed (for fallback or double-check)
+  // Fallback memory filtering for resilience
   if (products.length === 0) {
     products = [...SEED_PRODUCTS];
     inMemoryProducts = [...SEED_PRODUCTS];
@@ -124,6 +146,9 @@ export async function fetchProducts(filters?: {
   return products;
 }
 
+/**
+ * fetchProductById — Finds a single product by ID, slug, or SKU.
+ */
 export async function fetchProductById(idOrSlug: string): Promise<ProductItem | null> {
   const { isConnected, mode } = await connectToDatabase();
 
@@ -150,6 +175,18 @@ export async function fetchProductById(idOrSlug: string): Promise<ProductItem | 
   return found || null;
 }
 
+/**
+ * submitOrder — Persists an enterprise collateral order.
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Creates an order record with a generated serialized APEX reference ID (e.g. APX-982140).
+ * - Saves customer contact, item snapshots, shipping speed, and status.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Generates unique order number and ISO timestamp.
+ * 2. Saves to MongoDB via Order.create() if available.
+ * 3. Falls back to inMemoryOrders list if MongoDB is offline, returning the full OrderRecord.
+ */
 export async function submitOrder(orderInput: {
   customer: OrderRecord['customer'];
   items: OrderRecord['items'];

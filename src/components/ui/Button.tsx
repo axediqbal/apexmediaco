@@ -5,6 +5,9 @@ import { Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+/**
+ * ButtonProps — Configurable Button Attributes
+ */
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
@@ -13,6 +16,18 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   rightIcon?: React.ReactNode;
 }
 
+/**
+ * Button — Kinetic High-Impact Agency CTA Component
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Renders consistent, accessible button actions across primary (Electric Cobalt glow), secondary (glass), and outline variants.
+ * - Handles asynchronous loading spinners with aria-busy accessibility attributes.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Merges base reset classes with size and variant class tokens using twMerge and clsx.
+ * 2. Employs forwardRef for compatibility with Framer Motion, Next.js Link, and form controllers.
+ * 3. Supports left and right icon slots with automatic icon-spacing and spin animations.
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -41,11 +56,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary:
         'bg-[#2D68FF] text-white hover:bg-[#3D75FF] hover:shadow-[0_0_28px_rgba(45,104,255,0.45)] border border-[#5A8BFF]/40 active:bg-[#1A42AA]',
       secondary:
-        'bg-[#181822]/80 text-[#F5F5F8] backdrop-blur-md border border-white/10 hover:border-white/25 hover:bg-[#20202E] hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
+        'bg-[#181822]/80 text-[#F8F9FD] backdrop-blur-md border border-white/10 hover:border-white/25 hover:bg-[#20202E] hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
       outline:
-        'bg-transparent text-[#F5F5F8] border border-[#2D68FF]/50 hover:border-[#2D68FF] hover:bg-[#2D68FF]/10 hover:shadow-[0_0_20px_rgba(45,104,255,0.2)]',
+        'bg-transparent text-[#F8F9FD] border border-[#2D68FF]/50 hover:border-[#2D68FF] hover:bg-[#2D68FF]/10 hover:shadow-[0_0_20px_rgba(45,104,255,0.2)]',
       ghost:
-        'bg-transparent text-[#A1A1B0] hover:text-[#F5F5F8] hover:bg-white/5 active:bg-white/10',
+        'bg-transparent text-[#9FA5B9] hover:text-[#F8F9FD] hover:bg-white/5 active:bg-white/10',
       danger:
         'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 hover:border-red-500/60',
     };
@@ -54,6 +69,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || isLoading}
+        aria-busy={isLoading}
         className={twMerge(
           clsx(
             baseStyles,

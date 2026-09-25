@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { X, Check, ShoppingBag, ShieldCheck, Truck, Sparkles, Star, Layers, Cpu } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { X, Check, ShoppingBag, ShieldCheck, Star, Layers, Cpu } from 'lucide-react';
 import { ProductItem } from '@/types';
 import { useCart } from '@/context/CartContext';
 import Button from '@/components/ui/Button';
@@ -12,6 +12,19 @@ interface QuickSpecDrawerProps {
   onClose: () => void;
 }
 
+/**
+ * QuickSpecDrawer — Inline Engineering Inspection Drawer
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Renders a slide-in technical specification inspector when clicking 'Quick Spec' on any card.
+ * - Displays bill of materials, engineering tolerances (0.05mm), lead times, and quality certifications.
+ * - Provides an instant 'Quick Add Kit' action without navigating away from the catalog or homepage.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Conditionally renders when product !== null.
+ * 2. Locks body scroll when open and supports ESC key dismiss.
+ * 3. Triggers Add-to-Cart with visual checkmark feedback and automatically closes drawer after 1.2s.
+ */
 export const QuickSpecDrawer: React.FC<QuickSpecDrawerProps> = ({ product, onClose }) => {
   const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);

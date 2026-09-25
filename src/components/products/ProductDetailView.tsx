@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   Star, 
@@ -9,8 +9,6 @@ import {
   ShieldCheck, 
   Truck, 
   ArrowLeft, 
-  Clock, 
-  Layers, 
   Plus, 
   Minus,
   Sparkles,
@@ -28,6 +26,21 @@ interface ProductDetailViewProps {
   relatedProducts: ProductItem[];
 }
 
+/**
+ * ProductDetailView — Interactive Collateral Kit Specification & Purchase View
+ * 
+ * KIYA HORAHA HAI (WHAT IT DOES):
+ * - Displays high-resolution multi-angle studio photography with an interactive thumbnail switcher.
+ * - Manages interactive variant selections (sizes, colorways, finish tiers).
+ * - Enforces stock level guards (disables actions if stock is 0 and shows waitlist notice).
+ * - Triggers animated Add-to-Cart with visual state transitions (Idle -> Adding -> Added ✓).
+ * - Renders "What's Included in This Kit" bill of materials and related product recommendations.
+ * 
+ * KESE HORAHA HAI (HOW IT DOES IT):
+ * 1. Tracks active gallery index, quantity counter with lower boundary clamping (min 1).
+ * 2. Employs selectedVariants map initialized with the first option of each available variant.
+ * 3. Dispatches item to CartContext and opens the sliding cart drawer automatically.
+ */
 export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   product,
   relatedProducts,
