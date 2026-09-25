@@ -163,6 +163,14 @@ export const BentoGrid: React.FC = () => {
                 <p className="text-xs text-[#9FA5B9] leading-relaxed">
                   Synchronize PMS Pantone color codes directly with client design tokens, accompanied by tap-to-verify smart NFC tags.
                 </p>
+
+                <div className="relative aspect-[16/9] rounded-lg overflow-hidden my-2 border border-white/[0.08]">
+                  <img
+                    src="/images/agency/design-sprint-whiteboard.jpg"
+                    alt="APEX Token Design Sprint"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
               </div>
               <div className="mt-6 pt-4 border-t border-white/[0.08]">
                 <span className="text-xs font-mono text-[#5A8BFF] flex items-center gap-1">
@@ -239,6 +247,22 @@ export const BentoGrid: React.FC = () => {
                 <p className="text-sm text-[#9FA5B9] leading-relaxed">
                   Unreleased product launches and confidential brand guidelines remain completely guarded. Our production facility features biometric access controls, clean-room kitting, and strict embargo compliance.
                 </p>
+
+                {/* Confidential Boardroom Photo Frame */}
+                <div className="relative aspect-[16/7] rounded-xl overflow-hidden my-3 border border-white/[0.08] group/img">
+                  <img
+                    src="/images/agency/executive-boardroom.jpg"
+                    alt="APEX Confidential Executive Boardroom & Embargo Staging"
+                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-70" />
+                  <div className="absolute bottom-2.5 left-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[11px] font-mono text-[#F8F9FD] bg-black/70 px-2 py-0.5 rounded backdrop-blur-md border border-white/10">
+                      Embargo Staging War-Room • Biometric Access Only
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between">

@@ -75,6 +75,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     category: 'VIP Kits',
     images: [
       'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=80',
+      '/images/agency/executive-boardroom.jpg',
       '/images/logistics/terminal-night.jpg',
       'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80'
     ],
@@ -105,9 +106,10 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 490,
     category: 'Digital Systems',
     images: [
-      'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?auto=format&fit=crop&w=1200&q=80'
+      '/images/agency/ai-creative-lab.jpg',
+      '/images/agency/creative-designers.jpg',
+      '/images/agency/design-sprint-whiteboard.jpg',
+      'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80'
     ],
     variants: [
       { id: 'edition', name: 'Delivery Format', options: ['Digital Master + Linen Book', 'Digital Master Only (-$150)'] },
