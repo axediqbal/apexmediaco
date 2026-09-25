@@ -12,26 +12,28 @@ const VariantSchema = new Schema({
 }, { _id: false });
 
 const ProductSchema = new Schema<IProductDocument>({
-  name: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
+  name: { type: String, required: true, trim: true },
+  slug: { type: String, required: true, unique: true, index: true },
   tagline: { type: String, required: true },
   description: { type: String, required: true },
-  price: { type: Number, required: true, min: 0 },
+  price: { type: Number, required: true, min: 0, index: true },
   category: { 
     type: String, 
     required: true, 
+    index: true,
     enum: ['Apparel', 'Event & Signage', 'VIP Kits', 'Digital Systems'] 
   },
   images: [{ type: String, required: true }],
   variants: [VariantSchema],
   features: [{ type: String }],
-  stock: { type: Number, required: true, default: 0 },
-  rating: { type: Number, default: 5 },
-  reviewsCount: { type: Number, default: 0 },
-  featured: { type: Boolean, default: false },
+  stock: { type: Number, required: true, default: 0, min: 0 },
+  rating: { type: Number, default: 5, min: 0, max: 5 },
+  reviewsCount: { type: Number, default: 0, min: 0 },
+  featured: { type: Boolean, default: false, index: true },
   badge: { type: String },
-  sku: { type: String, required: true, unique: true },
-  leadTime: { type: String, default: '3-5 Business Days' }
+  sku: { type: String, required: true, unique: true, index: true },
+  leadTime: { type: String, default: '3-5 Business Days' },
+  specs: { type: Map, of: String, default: {} }
 }, {
   timestamps: true,
   toJSON: {
@@ -45,6 +47,11 @@ const ProductSchema = new Schema<IProductDocument>({
   }
 });
 
+// Text index for fast multi-field keyword search
+ProductSchema.index({ name: 'text', tagline: 'text', description: 'text' });
+
 // Guard against model recompilation in Next.js hot-reloading
 export const Product: Model<IProductDocument> = 
   mongoose.models.Product || mongoose.model<IProductDocument>('Product', ProductSchema);
+
+export default Product;

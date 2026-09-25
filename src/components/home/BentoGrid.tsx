@@ -16,47 +16,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Layers, ShieldCheck, Cpu, Truck, Sparkles, ArrowRight, Box } from 'lucide-react';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const tileVariants = {
-  hidden: { opacity: 0, y: 28, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.65,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  },
-};
 
 export const BentoGrid: React.FC = () => {
   return (
     <section id="capabilities" className="py-20 md:py-32 relative">
       <Container size="xl">
-        {/* Section Header with Fluid Motion */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
-        >
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
@@ -77,18 +46,12 @@ export const BentoGrid: React.FC = () => {
             <span>View All Collateral Specifications</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Bento Grid Layout with Cascading Stagger */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
-        >
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {/* Tile 1: Large Span (Col-span 2, Row-span 2) */}
-          <motion.div variants={tileVariants} className="md:col-span-2 lg:col-span-2">
+          <div data-gsap-card="true" className="md:col-span-2 lg:col-span-2">
             <GlassCard className="h-full p-8 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#2D68FF]/15 border border-[#2D68FF]/30 flex items-center justify-center text-[#5A8BFF] shadow-[0_0_20px_rgba(45,104,255,0.3)]">
@@ -120,10 +83,10 @@ export const BentoGrid: React.FC = () => {
                 </div>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
 
           {/* Tile 2: Event & Stage Systems (Col-span 1) */}
-          <motion.div variants={tileVariants} className="col-span-1">
+          <div data-gsap-card="true" className="col-span-1">
             <GlassCard className="h-full p-8 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#2D68FF]/15 border border-[#2D68FF]/30 flex items-center justify-center text-[#5A8BFF] shadow-[0_0_20px_rgba(45,104,255,0.25)]">
@@ -145,10 +108,10 @@ export const BentoGrid: React.FC = () => {
                 </span>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
 
           {/* Tile 3: Digital-Physical Synchronization (Col-span 1) */}
-          <motion.div variants={tileVariants} className="col-span-1">
+          <div data-gsap-card="true" className="col-span-1">
             <GlassCard className="h-full p-8 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#2D68FF]/15 border border-[#2D68FF]/30 flex items-center justify-center text-[#5A8BFF] shadow-[0_0_20px_rgba(45,104,255,0.25)]">
@@ -178,10 +141,10 @@ export const BentoGrid: React.FC = () => {
                 </span>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
 
           {/* Tile 4: 72-Hour Rapid Logistics (Col-span 2) */}
-          <motion.div variants={tileVariants} className="md:col-span-2 lg:col-span-2">
+          <div data-gsap-card="true" className="md:col-span-2 lg:col-span-2">
             <GlassCard id="logistics" className="h-full p-8 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#2D68FF]/15 border border-[#2D68FF]/30 flex items-center justify-center text-[#5A8BFF] shadow-[0_0_20px_rgba(45,104,255,0.25)]">
@@ -229,10 +192,10 @@ export const BentoGrid: React.FC = () => {
                 </div>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
 
           {/* Tile 5: Enterprise Security & White-Label NDA (Col-span 2) */}
-          <motion.div variants={tileVariants} className="md:col-span-2 lg:col-span-2">
+          <div data-gsap-card="true" className="md:col-span-2 lg:col-span-2">
             <GlassCard className="h-full p-8 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#2D68FF]/15 border border-[#2D68FF]/30 flex items-center justify-center text-[#5A8BFF] shadow-[0_0_20px_rgba(45,104,255,0.3)]">
@@ -274,8 +237,8 @@ export const BentoGrid: React.FC = () => {
                 </span>
               </div>
             </GlassCard>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </Container>
     </section>
   );

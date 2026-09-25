@@ -1,5 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { submitOrder } from '@/lib/dataStore';
+import { submitOrder, fetchOrders } from '@/lib/dataStore';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email') || undefined;
+    const status = searchParams.get('status') || undefined;
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : undefined;
+
+    const orders = await fetchOrders({ email, status, limit });
+
+    return NextResponse.json({
+      success: true,
+      count: orders.length,
+      data: orders
+    });
+  } catch (error: any) {
+    console.error('Error fetching orders:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to retrieve orders', error: error?.message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +53,8 @@ export async function POST(request: NextRequest) {
       tax: Number(tax) || 0,
       total: Number(total) || 0,
       shippingMethod: shippingMethod || 'standard',
-      paymentMethod: paymentMethod || 'invoice'
+      paymentMethod: paymentMethod || 'invoice',
+      notes: body.notes
     });
 
     return NextResponse.json({
@@ -38,10 +62,10 @@ export async function POST(request: NextRequest) {
       message: 'Order placed successfully',
       data: order
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating order:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to process order submission' },
+      { success: false, message: 'Failed to process order submission', error: error?.message },
       { status: 500 }
     );
   }

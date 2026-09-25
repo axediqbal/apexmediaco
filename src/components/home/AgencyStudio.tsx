@@ -69,30 +69,6 @@ const studioFeatures: StudioPhoto[] = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 25, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.65,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  },
-};
-
 export const AgencyStudio: React.FC = () => {
   const [activePhoto, setActivePhoto] = useState<StudioPhoto | null>(null);
 
@@ -103,13 +79,7 @@ export const AgencyStudio: React.FC = () => {
 
       <Container size="xl">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
-        >
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
@@ -127,18 +97,12 @@ export const AgencyStudio: React.FC = () => {
             <Users className="w-4 h-4" />
             <span>45+ In-House Creative Engineers</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Studio Cards Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {studioFeatures.map((item) => (
-            <motion.div key={item.id} variants={cardVariants}>
+            <div key={item.id} data-gsap-card="true">
               <GlassCard
                 className="h-full p-6 sm:p-8 flex flex-col justify-between group cursor-pointer hover:border-[#2D68FF]/50 transition-all duration-300"
                 onClick={() => setActivePhoto(item)}
@@ -190,9 +154,9 @@ export const AgencyStudio: React.FC = () => {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </Container>
 
       {/* High-Res Photo Lightbox Modal */}

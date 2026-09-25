@@ -23,12 +23,32 @@ export interface ProductItem {
   sku: string;
   leadTime: string;
   specs?: Record<string, string>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CartItem {
   product: ProductItem;
   quantity: number;
   selectedVariants: Record<string, string>;
+}
+
+export interface CartItemRecord {
+  productId: string;
+  productName: string;
+  price: number;
+  image: string;
+  quantity: number;
+  selectedVariants: Record<string, string>;
+}
+
+export interface CartRecord {
+  id?: string;
+  sessionId: string;
+  items: CartItemRecord[];
+  subtotal: number;
+  itemCount: number;
+  updatedAt: string;
 }
 
 export interface CustomerInfo {
@@ -68,4 +88,5 @@ export interface OrderRecord {
   shippingMethod: 'standard' | 'express' | 'white-glove';
   status: 'Processing' | 'Production' | 'Dispatched' | 'Delivered';
   paymentMethod: 'invoice' | 'corporate-card';
+  notes?: string;
 }

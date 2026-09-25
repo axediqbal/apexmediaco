@@ -18,30 +18,6 @@ import { Quote, Sparkles, Star } from 'lucide-react';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 28, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  },
-};
-
 export const Testimonials: React.FC = () => {
   const testimonials = [
     {
@@ -76,14 +52,8 @@ export const Testimonials: React.FC = () => {
   return (
     <section id="testimonials" className="py-20 md:py-32 relative">
       <Container size="xl">
-        {/* Section Header with Reveal */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-2xl mx-auto space-y-3 mb-16"
-        >
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Case Studies & Client Impact</span>
@@ -94,22 +64,14 @@ export const Testimonials: React.FC = () => {
           <p className="text-sm sm:text-base text-[#A1A1B0]">
             How tier-one brands leverage APEX collateral to drive executive retention and unforgettable summit experiences.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Testimonial Cards Grid with Stagger */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
+        {/* Testimonial Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((item, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={cardVariants}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
+              data-gsap-card="true"
             >
               <GlassCard className="h-full p-8 flex flex-col justify-between hover:border-[#2D68FF]/40 transition-all duration-300">
                 <div className="space-y-4">
@@ -145,9 +107,9 @@ export const Testimonials: React.FC = () => {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </Container>
     </section>
   );

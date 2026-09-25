@@ -1,8 +1,9 @@
 import { connectToDatabase } from './db';
 import { Product } from '@/models/Product';
 import { Order } from '@/models/Order';
+import { Cart } from '@/models/Cart';
 import { SEED_PRODUCTS } from '@/data/seedData';
-import { ProductItem, OrderRecord } from '@/types';
+import { ProductItem, OrderRecord, CartRecord, CartItemRecord } from '@/types';
 
 /**
  * In-memory fallback stores (active when MONGODB_URI is absent or offline).
@@ -10,6 +11,7 @@ import { ProductItem, OrderRecord } from '@/types';
  */
 let inMemoryProducts: ProductItem[] = [...SEED_PRODUCTS];
 const inMemoryOrders: OrderRecord[] = [];
+const inMemoryCarts: Map<string, CartRecord> = new Map();
 
 /**
  * seedProducts — Seeds or re-seeds the catalog with APEX collateral kits.
@@ -31,10 +33,11 @@ export async function seedProducts(force: boolean = false): Promise<{ count: num
       if (force) {
         await Product.deleteMany({});
       }
-      const docs = SEED_PRODUCTS.map((p) => ({
-        ...p,
-        _id: undefined
-      }));
+      const docs = SEED_PRODUCTS.map((p) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id, ...rest } = p;
+        return rest;
+      });
       await Product.insertMany(docs);
       const count = await Product.countDocuments();
       return { count, mode: 'mongodb' };
@@ -50,18 +53,13 @@ export async function seedProducts(force: boolean = false): Promise<{ count: num
 
 /**
  * fetchProducts — Retrieves products with optional filtering and sorting.
- * 
- * KIYA HORAHA HAI (WHAT IT DOES):
- * - Returns a list of collateral kits filtered by category and search keyword, sorted by price or rating.
- * 
- * KESE HORAHA HAI (HOW IT DOES IT):
- * 1. Queries MongoDB via Mongoose with dynamic regex queries when connected.
- * 2. If MongoDB is offline or empty, executes identical filtering in memory against inMemoryProducts.
  */
 export async function fetchProducts(filters?: {
   category?: string;
   search?: string;
   sort?: string;
+  limit?: number;
+  skip?: number;
 }): Promise<ProductItem[]> {
   const { isConnected, mode } = await connectToDatabase();
 
@@ -77,7 +75,8 @@ export async function fetchProducts(filters?: {
         query.$or = [
           { name: { $regex: filters.search, $options: 'i' } },
           { tagline: { $regex: filters.search, $options: 'i' } },
-          { description: { $regex: filters.search, $options: 'i' } }
+          { description: { $regex: filters.search, $options: 'i' } },
+          { sku: { $regex: filters.search, $options: 'i' } }
         ];
       }
 
@@ -93,13 +92,21 @@ export async function fetchProducts(filters?: {
         mongoQuery = mongoQuery.sort({ featured: -1, createdAt: -1 });
       }
 
+      if (filters?.skip) {
+        mongoQuery = mongoQuery.skip(filters.skip);
+      }
+      if (filters?.limit) {
+        mongoQuery = mongoQuery.limit(filters.limit);
+      }
+
       const results = await mongoQuery.lean();
       if (results.length > 0) {
         products = results.map((doc: any) => ({
           ...doc,
           id: doc._id?.toString() || doc.id || doc.sku
         }));
-      } else {
+      } else if (!filters?.search && (!filters?.category || filters.category === 'All')) {
+        // Auto-seed if database is completely empty on initial connect
         await seedProducts();
         const recheck = await Product.find(query).lean();
         products = recheck.map((doc: any) => ({
@@ -116,7 +123,7 @@ export async function fetchProducts(filters?: {
   }
 
   // Fallback memory filtering for resilience
-  if (products.length === 0) {
+  if (products.length === 0 && !filters?.search) {
     products = [...SEED_PRODUCTS];
     inMemoryProducts = [...SEED_PRODUCTS];
   }
@@ -131,7 +138,8 @@ export async function fetchProducts(filters?: {
       (p) =>
         p.name.toLowerCase().includes(s) ||
         p.tagline.toLowerCase().includes(s) ||
-        p.description.toLowerCase().includes(s)
+        p.description.toLowerCase().includes(s) ||
+        p.sku.toLowerCase().includes(s)
     );
   }
 
@@ -176,16 +184,30 @@ export async function fetchProductById(idOrSlug: string): Promise<ProductItem | 
 }
 
 /**
+ * createProduct — Creates a new product in MongoDB or memory fallback.
+ */
+export async function createProduct(productData: Omit<ProductItem, 'id'>): Promise<ProductItem> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    const doc = await Product.create(productData);
+    const item = doc.toJSON() as any;
+    return {
+      ...item,
+      id: doc._id.toString()
+    };
+  }
+
+  const newProduct: ProductItem = {
+    ...productData,
+    id: `prod_${Date.now()}`
+  };
+  inMemoryProducts.push(newProduct);
+  return newProduct;
+}
+
+/**
  * submitOrder — Persists an enterprise collateral order.
- * 
- * KIYA HORAHA HAI (WHAT IT DOES):
- * - Creates an order record with a generated serialized APEX reference ID (e.g. APX-982140).
- * - Saves customer contact, item snapshots, shipping speed, and status.
- * 
- * KESE HORAHA HAI (HOW IT DOES IT):
- * 1. Generates unique order number and ISO timestamp.
- * 2. Saves to MongoDB via Order.create() if available.
- * 3. Falls back to inMemoryOrders list if MongoDB is offline, returning the full OrderRecord.
  */
 export async function submitOrder(orderInput: {
   customer: OrderRecord['customer'];
@@ -196,6 +218,7 @@ export async function submitOrder(orderInput: {
   total: number;
   shippingMethod: OrderRecord['shippingMethod'];
   paymentMethod: OrderRecord['paymentMethod'];
+  notes?: string;
 }): Promise<OrderRecord> {
   const { isConnected, mode } = await connectToDatabase();
 
@@ -214,7 +237,8 @@ export async function submitOrder(orderInput: {
     total: orderInput.total,
     shippingMethod: orderInput.shippingMethod,
     status: 'Processing',
-    paymentMethod: orderInput.paymentMethod
+    paymentMethod: orderInput.paymentMethod,
+    notes: orderInput.notes
   };
 
   if (isConnected && mode === 'mongodb') {
@@ -229,7 +253,8 @@ export async function submitOrder(orderInput: {
         total: orderInput.total,
         shippingMethod: orderInput.shippingMethod,
         status: 'Processing',
-        paymentMethod: orderInput.paymentMethod
+        paymentMethod: orderInput.paymentMethod,
+        notes: orderInput.notes
       });
       newOrder.id = doc._id.toString();
     } catch (err) {
@@ -241,4 +266,173 @@ export async function submitOrder(orderInput: {
   }
 
   return newOrder;
+}
+
+/**
+ * fetchOrders — Retrieves orders with optional email or status filter.
+ */
+export async function fetchOrders(filter?: { email?: string; status?: string; limit?: number }): Promise<OrderRecord[]> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const query: Record<string, unknown> = {};
+      if (filter?.email) {
+        query['customer.workEmail'] = filter.email.toLowerCase();
+      }
+      if (filter?.status) {
+        query.status = filter.status;
+      }
+
+      let mongoQuery = Order.find(query).sort({ createdAt: -1 });
+      if (filter?.limit) {
+        mongoQuery = mongoQuery.limit(filter.limit);
+      }
+
+      const docs = await mongoQuery.lean();
+      return docs.map((d: any) => ({
+        ...d,
+        id: d._id?.toString() || d.id
+      }));
+    } catch (err) {
+      console.warn('[APEX DB] Failed to query orders from MongoDB, using memory', err);
+    }
+  }
+
+  let results = [...inMemoryOrders];
+  if (filter?.email) {
+    results = results.filter((o) => o.customer.workEmail.toLowerCase() === filter.email?.toLowerCase());
+  }
+  if (filter?.status) {
+    results = results.filter((o) => o.status === filter.status);
+  }
+  if (filter?.limit) {
+    results = results.slice(0, filter.limit);
+  }
+  return results;
+}
+
+/**
+ * fetchOrderById — Retrieves a single order by orderNumber or ID.
+ */
+export async function fetchOrderById(idOrNumber: string): Promise<OrderRecord | null> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(idOrNumber);
+      const query = isObjectId ? { _id: idOrNumber } : { orderNumber: idOrNumber };
+      const doc = await Order.findOne(query).lean();
+      if (doc) {
+        const item = doc as any;
+        return {
+          ...item,
+          id: item._id?.toString() || item.id
+        };
+      }
+    } catch (err) {
+      console.warn('[APEX DB] Failed to fetch order by ID from MongoDB, checking memory', err);
+    }
+  }
+
+  const found = inMemoryOrders.find((o) => o.id === idOrNumber || o.orderNumber === idOrNumber);
+  return found || null;
+}
+
+/**
+ * getCart — Fetches persistent cart by sessionId.
+ */
+export async function getCart(sessionId: string): Promise<CartRecord> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const doc = await Cart.findOne({ sessionId }).lean();
+      if (doc) {
+        const c = doc as any;
+        return {
+          id: c._id?.toString(),
+          sessionId: c.sessionId,
+          items: c.items || [],
+          subtotal: c.subtotal || 0,
+          itemCount: c.itemCount || 0,
+          updatedAt: c.updatedAt ? new Date(c.updatedAt).toISOString() : new Date().toISOString()
+        };
+      }
+    } catch (err) {
+      console.warn('[APEX DB] Failed to fetch cart from MongoDB, using memory', err);
+    }
+  }
+
+  const memoryCart = inMemoryCarts.get(sessionId);
+  if (memoryCart) {
+    return memoryCart;
+  }
+
+  return {
+    sessionId,
+    items: [],
+    subtotal: 0,
+    itemCount: 0,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * saveCart — Upserts persistent cart items by sessionId.
+ */
+export async function saveCart(sessionId: string, items: CartItemRecord[]): Promise<CartRecord> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const now = new Date().toISOString();
+
+  const updatedCart: CartRecord = {
+    sessionId,
+    items,
+    subtotal,
+    itemCount,
+    updatedAt: now
+  };
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const doc = await Cart.findOneAndUpdate(
+        { sessionId },
+        { items, subtotal, itemCount },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      ).lean();
+      if (doc) {
+        const c = doc as any;
+        updatedCart.id = c._id?.toString();
+      }
+    } catch (err) {
+      console.warn('[APEX DB] Failed to upsert cart in MongoDB, using memory', err);
+      inMemoryCarts.set(sessionId, updatedCart);
+    }
+  } else {
+    inMemoryCarts.set(sessionId, updatedCart);
+  }
+
+  return updatedCart;
+}
+
+/**
+ * clearCart — Empties cart for a session.
+ */
+export async function clearCart(sessionId: string): Promise<boolean> {
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      await Cart.deleteOne({ sessionId });
+      return true;
+    } catch (err) {
+      console.warn('[APEX DB] Failed to clear cart in MongoDB', err);
+    }
+  }
+
+  inMemoryCarts.delete(sessionId);
+  return true;
 }

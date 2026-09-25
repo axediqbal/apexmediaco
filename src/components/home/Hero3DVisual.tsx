@@ -425,15 +425,15 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // 12. Animation Render Loop
-    const clock = new THREE.Clock();
+    // 12. Animation Render Loop (High-precision timer without THREE.Clock deprecation)
+    const startTime = performance.now();
 
     const animate = () => {
       animFrameRef.current = requestAnimationFrame(animate);
 
       if (!isVisibleRef.current) return;
 
-      const elapsed = clock.getElapsedTime();
+      const elapsed = (performance.now() - startTime) * 0.001;
 
       // Damped mouse movement for dynamic lighting reflection
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.06;

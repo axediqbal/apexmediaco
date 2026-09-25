@@ -32,6 +32,7 @@ interface Particle {
 export const ParticleConstellation: React.FC<{ className?: string }> = ({ className }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef<{ x: number; y: number; active: boolean }>({ x: -1000, y: -1000, active: false });
+  const isVisibleRef = useRef<boolean>(true);
   const prefersReduced = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -42,6 +43,17 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Observe visibility to pause rendering when hero is scrolled out of viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisibleRef.current = entry.isIntersecting;
+        });
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(canvas);
 
     let animationFrameId: number;
     let width = (canvas.width = canvas.offsetWidth);
@@ -90,6 +102,11 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
     const mouseRadius = 140;
 
     const render = () => {
+      if (!isVisibleRef.current) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       // 1. Update and draw individual particle nodes
@@ -153,6 +170,7 @@ export const ParticleConstellation: React.FC<{ className?: string }> = ({ classN
     render();
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);

@@ -29,30 +29,6 @@ interface FeaturedKitsProps {
   products: ProductItem[];
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 24, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.55,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  },
-};
-
 export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
   const { addToCart } = useCart();
   const [addedId, setAddedId] = React.useState<string | null>(null);
@@ -76,14 +52,8 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[140px] pointer-events-none rounded-full" />
 
       <Container size="xl">
-        {/* Section Header with Fluid Fade-in */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
-        >
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
@@ -102,26 +72,19 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
               Explore Full Catalog ({products.length})
             </Button>
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Product Cards Grid with Stagger Cascade */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
+        {/* Product Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredList.map((product) => {
             const isOutOfStock = product.stock === 0;
             const isJustAdded = addedId === product.id;
 
             return (
-              <motion.div
+              <div
                 key={product.id}
-                variants={cardVariants}
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
+                data-gsap-card="true"
+                className="group/card-wrapper"
               >
                 <Link
                   href={`/products/${product.slug || product.id}`}
@@ -228,10 +191,10 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
                     </div>
                   </GlassCard>
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
       </Container>
 
       {/* Inline Quick Spec Inspection Drawer */}

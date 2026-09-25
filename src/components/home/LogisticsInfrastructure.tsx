@@ -91,30 +91,6 @@ const hubs: HubPhoto[] = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 25, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.65,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  },
-};
-
 export const LogisticsInfrastructure: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<HubPhoto | null>(null);
 
@@ -125,13 +101,7 @@ export const LogisticsInfrastructure: React.FC = () => {
 
       <Container size="xl">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
-        >
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Truck className="w-3.5 h-3.5" />
@@ -153,20 +123,14 @@ export const LogisticsInfrastructure: React.FC = () => {
             <span>•</span>
             <span className="text-[#5A8BFF]">72h Delivery SLA</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Photography Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {hubs.map((hub) => (
-            <motion.div
+            <div
               key={hub.id}
-              variants={itemVariants}
+              data-gsap-card="true"
               className={hub.spanClass}
             >
               <GlassCard 
@@ -225,9 +189,9 @@ export const LogisticsInfrastructure: React.FC = () => {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </Container>
 
       {/* Expanded Photo Inspection Modal */}

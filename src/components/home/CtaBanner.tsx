@@ -24,11 +24,8 @@ export const CtaBanner: React.FC = () => {
   return (
     <section className="py-20 md:py-28 relative overflow-hidden">
       <Container size="xl">
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        <div
+          data-gsap-card="true"
           className="relative rounded-3xl p-8 sm:p-14 bg-gradient-to-br from-[#12121A] via-[#101018] to-[#0A0A0C] border border-[#2D68FF]/30 shadow-[0_20px_70px_rgba(0,0,0,0.8),0_0_50px_rgba(45,104,255,0.2)] overflow-hidden"
         >
           {/* Moving Specular Highlight & Radial Glow */}
@@ -89,7 +86,7 @@ export const CtaBanner: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </Container>
     </section>
   );

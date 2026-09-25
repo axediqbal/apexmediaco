@@ -226,8 +226,8 @@ export const GsapScrollTriggerProvider: React.FC<{ children: React.ReactNode }> 
         // Create ScrollTrigger for re-triggering on EVERY scroll entry
         const trigger = ScrollTrigger.create({
           trigger: section,
-          start: isMobile ? 'top 88%' : 'top 82%',
-          end: 'bottom 12%',
+          start: isMobile ? 'top 90%' : 'top 85%',
+          end: 'bottom top',
           onEnter: () => {
             tl.restart();
           },
@@ -236,11 +236,11 @@ export const GsapScrollTriggerProvider: React.FC<{ children: React.ReactNode }> 
             tl.restart();
           },
           onLeave: () => {
-            // Pause & reset when scrolled completely past bottom
+            // Reset when section has completely scrolled above the viewport
             tl.pause(0);
           },
           onLeaveBack: () => {
-            // Pause & reset when scrolled above the section
+            // Reset when section has completely scrolled below the viewport
             tl.pause(0);
           },
         });

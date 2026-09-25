@@ -1,5 +1,6 @@
 import React from 'react';
 import Container from '@/components/ui/Container';
+import Skeleton from '@/components/ui/Skeleton';
 
 export default function ProductsLoading() {
   return (
@@ -7,16 +8,16 @@ export default function ProductsLoading() {
       <Container size="xl">
         {/* Header Skeleton */}
         <div className="space-y-4 mb-10">
-          <div className="w-32 h-6 rounded-full bg-white/[0.04] animate-pulse" />
-          <div className="w-80 h-10 rounded-xl bg-white/[0.06] animate-pulse" />
-          <div className="w-full max-w-lg h-4 rounded bg-white/[0.04] animate-pulse" />
+          <Skeleton className="w-32 h-6 rounded-full" />
+          <Skeleton className="w-80 h-10 rounded-xl" />
+          <Skeleton className="w-full max-w-lg h-4 rounded" />
         </div>
 
         {/* Search & Filters Bar Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
-          <div className="md:col-span-6 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] animate-pulse" />
-          <div className="md:col-span-3 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] animate-pulse" />
-          <div className="md:col-span-3 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] animate-pulse" />
+          <Skeleton className="md:col-span-6 h-12 rounded-xl" />
+          <Skeleton className="md:col-span-3 h-12 rounded-xl" />
+          <Skeleton className="md:col-span-3 h-12 rounded-xl" />
         </div>
 
         {/* Product Cards Skeleton Grid */}
@@ -26,19 +27,17 @@ export default function ProductsLoading() {
               key={i}
               className="p-4 rounded-2xl bg-[#111219] border border-white/[0.06] flex flex-col justify-between space-y-4"
             >
-              <div className="relative aspect-[4/3] rounded-xl bg-white/[0.03] animate-pulse overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-              </div>
+              <Skeleton className="aspect-[4/3] rounded-xl w-full" />
 
               <div className="space-y-2">
-                <div className="w-20 h-4 rounded bg-white/[0.04] animate-pulse" />
-                <div className="w-full h-5 rounded bg-white/[0.06] animate-pulse" />
-                <div className="w-3/4 h-3 rounded bg-white/[0.03] animate-pulse" />
+                <Skeleton className="w-20 h-4 rounded" />
+                <Skeleton className="w-full h-5 rounded" />
+                <Skeleton className="w-3/4 h-3 rounded" />
               </div>
 
               <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                <div className="w-16 h-6 rounded bg-white/[0.05] animate-pulse" />
-                <div className="w-9 h-9 rounded-xl bg-white/[0.04] animate-pulse" />
+                <Skeleton className="w-16 h-6 rounded" />
+                <Skeleton className="w-9 h-9 rounded-xl" />
               </div>
             </div>
           ))}
