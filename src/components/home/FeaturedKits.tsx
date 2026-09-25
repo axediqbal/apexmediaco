@@ -1,7 +1,21 @@
 'use client';
 
+/**
+ * @file FeaturedKits.tsx
+ * @description Flagship Collateral Kits Section with Staggered Cascading Animation
+ * 
+ * KIYA HORAHA HAI:
+ * - Agency ke top 4 flagship kits display karta hai.
+ * - Quick Spec inspection drawer aur instant Add-to-Cart trigger provide karta hai.
+ * 
+ * KESE HORAHA HAI:
+ * - Framer Motion ke `containerVariants` aur `cardVariants` ke zariye scroll-triggered cascading animation.
+ * - Har product card viewport men aate waqt subtle rise aur fade animation karta hai, aur hover karne par -6px smooth elevation lift deta hai.
+ */
+
 import React from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag, Star, Sparkles, Check, Eye } from 'lucide-react';
 import { ProductItem } from '@/types';
 import { useCart } from '@/context/CartContext';
@@ -14,6 +28,30 @@ import QuickSpecDrawer from '@/components/products/QuickSpecDrawer';
 interface FeaturedKitsProps {
   products: ProductItem[];
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  },
+};
 
 export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
   const { addToCart } = useCart();
@@ -38,8 +76,14 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[140px] pointer-events-none rounded-full" />
 
       <Container size="xl">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        {/* Section Header with Fluid Fade-in */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+        >
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
@@ -58,82 +102,93 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
               Explore Full Catalog ({products.length})
             </Button>
           </Link>
-        </div>
+        </motion.div>
 
-        {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Product Cards Grid with Stagger Cascade */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {featuredList.map((product) => {
             const isOutOfStock = product.stock === 0;
             const isJustAdded = addedId === product.id;
 
             return (
-              <Link
+              <motion.div
                 key={product.id}
-                href={`/products/${product.slug || product.id}`}
-                className="group block"
+                variants={cardVariants}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
               >
-                <GlassCard className="h-full flex flex-col justify-between p-4 group-hover:border-[#2D68FF]/40 transition-all duration-300">
-                  {/* Image thumbnail frame */}
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-4">
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                    />
+                <Link
+                  href={`/products/${product.slug || product.id}`}
+                  className="group block h-full"
+                >
+                  <GlassCard className="h-full flex flex-col justify-between p-4 group-hover:border-[#2D68FF]/50 transition-all duration-300">
+                    {/* Image thumbnail frame */}
+                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-4">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      />
 
-                    {/* Category tag */}
-                    <div className="absolute top-2.5 left-2.5">
-                      <Badge variant="cobalt" size="sm">
-                        {product.category}
-                      </Badge>
-                    </div>
-
-                    {/* Stock badge */}
-                    {isOutOfStock && (
-                      <div className="absolute top-2.5 right-2.5">
-                        <Badge variant="amber" size="sm">
-                          Waitlist Only
+                      {/* Category tag */}
+                      <div className="absolute top-2.5 left-2.5">
+                        <Badge variant="cobalt" size="sm">
+                          {product.category}
                         </Badge>
                       </div>
-                    )}
 
-                    {product.badge && !isOutOfStock && (
-                      <div className="absolute bottom-2.5 left-2.5">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0A0A0C]/85 border border-white/15 text-[#F5F5F8]">
-                          {product.badge}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                      {/* Stock badge */}
+                      {isOutOfStock && (
+                        <div className="absolute top-2.5 right-2.5">
+                          <Badge variant="amber" size="sm">
+                            Waitlist Only
+                          </Badge>
+                        </div>
+                      )}
 
-                  {/* Body Content */}
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-1 text-amber-400 text-xs mb-1.5">
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <span className="font-semibold text-[#F5F5F8]">{product.rating}</span>
-                        <span className="text-[#71717A]">({product.reviewsCount})</span>
-                      </div>
-
-                      <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2">
-                        {product.name}
-                      </h3>
-
-                      <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed">
-                        {product.tagline}
-                      </p>
+                      {product.badge && !isOutOfStock && (
+                        <div className="absolute bottom-2.5 left-2.5">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0A0A0C]/85 border border-white/15 text-[#F5F5F8]">
+                            {product.badge}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Price and Add button */}
-                    <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                    {/* Body Content */}
+                    <div className="flex-1 flex flex-col justify-between">
                       <div>
-                        <span className="text-base font-bold text-[#F5F5F8] font-mono">
-                          ${product.price.toLocaleString()}
-                        </span>
-                        <span className="block text-[10px] text-[#71717A] font-mono">
-                          {product.leadTime}
-                        </span>
+                        <div className="flex items-center gap-1 text-amber-400 text-xs mb-1.5">
+                          <Star className="w-3.5 h-3.5 fill-current" />
+                          <span className="font-semibold text-[#F5F5F8]">{product.rating}</span>
+                          <span className="text-[#71717A]">({product.reviewsCount})</span>
+                        </div>
+
+                        <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed">
+                          {product.tagline}
+                        </p>
                       </div>
+
+                      {/* Price and Add button */}
+                      <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                        <div>
+                          <span className="text-base font-bold text-[#F5F5F8] font-mono">
+                            ${product.price.toLocaleString()}
+                          </span>
+                          <span className="block text-[10px] text-[#71717A] font-mono">
+                            {product.leadTime}
+                          </span>
+                        </div>
 
                         <div className="flex items-center gap-2">
                           <button
@@ -173,9 +228,10 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
                     </div>
                   </GlassCard>
                 </Link>
-              );
-            })}
-          </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </Container>
 
       {/* Inline Quick Spec Inspection Drawer */}

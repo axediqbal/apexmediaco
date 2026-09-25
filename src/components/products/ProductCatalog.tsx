@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   SlidersHorizontal, 
@@ -199,20 +200,29 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => {
-              const isOutOfStock = product.stock === 0;
-              const isJustAdded = addedId === product.id;
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.map((product) => {
+                const isOutOfStock = product.stock === 0;
+                const isJustAdded = addedId === product.id;
 
-              return (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.slug || product.id}`}
-                  className="group block"
-                >
-                  <GlassCard className="h-full flex flex-col justify-between p-4 group-hover:border-[#2D68FF]/40 transition-all duration-300">
-                    {/* Thumbnail */}
-                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-4">
+                return (
+                  <motion.div
+                    layout
+                    key={product.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    whileHover={{ y: -6 }}
+                  >
+                    <Link
+                      href={`/products/${product.slug || product.id}`}
+                      className="group block h-full"
+                    >
+                      <GlassCard className="h-full flex flex-col justify-between p-4 group-hover:border-[#2D68FF]/40 transition-all duration-300">
+                        {/* Thumbnail */}
+                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-4">
                       <img
                         src={product.images[0]}
                         alt={product.name}
@@ -311,10 +321,12 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
                     </div>
                   </GlassCard>
                 </Link>
-              );
-            })}
-          </div>
-        )}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </motion.div>
+    )}
       </Container>
 
       {/* Inline Quick Spec Inspection Drawer */}
