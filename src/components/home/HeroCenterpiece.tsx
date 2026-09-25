@@ -1,11 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Sparkles, Box, Layers, Zap, CheckCircle2 } from 'lucide-react';
+/**
+ * @file HeroCenterpiece.tsx
+ * @description Interactive 3D Spatial Visual & Physical Kit Showcase Chamber
+ * 
+ * KIYA HORAHA HAI:
+ * - APEX Hero section ke right column mein interactive 3D spatial monolith render karta hai.
+ * - Dynamic import (lazy loading) ke through WebGL Three.js 3D visual ya Spline scene load karta hai.
+ * - User physical kits (Vault, Apparel, Stage) aur 3D Spatial Monolith ke beech seamlessly toggle kar sakta hai.
+ * - Mouse perspective tilt aur ambient specular lighting maintain karta hai.
+ */
+
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { ShieldCheck, Sparkles, Box, Layers, Zap, CheckCircle2, Rotate3d, Compass } from 'lucide-react';
+
+// Lazy-loaded 3D Element with static poster fallback
+const Hero3DVisual = dynamic(() => import('./Hero3DVisual'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full aspect-[4/3] sm:aspect-[16/11] rounded-3xl bg-[#090A0F] border border-white/[0.08] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-[#2D68FF]/30 border-t-[#2D68FF] animate-spin" />
+        <span className="text-xs font-mono text-[#858B9E]">Loading 3D Spatial Core...</span>
+      </div>
+    </div>
+  ),
+});
 
 export const HeroCenterpiece: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [activeTab, setActiveTab] = useState<'vault' | 'apparel' | 'stage'>('vault');
+  const [activeTab, setActiveTab] = useState<'3d-core' | 'vault' | 'apparel' | 'stage'>('3d-core');
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -19,6 +44,15 @@ export const HeroCenterpiece: React.FC = () => {
   };
 
   const activeKitData = {
+    '3d-core': {
+      name: 'APEX Spatial Core & 3D Monolith',
+      subtitle: 'Aerospace-Grade Obsidian Geometry with Resonant Gyroscope',
+      price: 'Custom Spec',
+      badge: 'Interactive 3D Engine',
+      leadTime: 'Realtime WebGL',
+      metric: '60 FPS Hardware Render',
+      image: '/images/agency/ai-creative-lab.jpg',
+    },
     vault: {
       name: 'APEX VIP Onboarding Vault',
       subtitle: 'Aerospace Grade 6061-T6 Aluminum Unboxing Chamber',
@@ -45,7 +79,7 @@ export const HeroCenterpiece: React.FC = () => {
       leadTime: '7-10 Days',
       metric: '3000K Calibrated LED',
       image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
-    }
+    },
   }[activeTab];
 
   return (
@@ -67,7 +101,7 @@ export const HeroCenterpiece: React.FC = () => {
       <div
         className="relative rounded-3xl p-6 sm:p-8 bg-[#101016]/85 backdrop-blur-2xl border border-white/[0.12] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(45,104,255,0.15)] transition-transform duration-200 ease-out"
         style={{
-          transform: `rotateY(${mousePos.x * 8}deg) rotateX(${-mousePos.y * 8}deg)`,
+          transform: `rotateY(${mousePos.x * 6}deg) rotateX(${-mousePos.y * 6}deg)`,
         }}
       >
         {/* Moving Specular Highlight Line */}
@@ -81,55 +115,64 @@ export const HeroCenterpiece: React.FC = () => {
         />
 
         {/* Top Floating Control Bar */}
-        <div className="relative z-10 flex items-center justify-between gap-2 pb-5 border-b border-white/[0.08]">
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-white/[0.08]">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#2D68FF] animate-pulse" />
             <span className="text-[11px] font-mono uppercase tracking-wider text-[#A1A1B0]">
-              Interactive Showcase
+              {activeTab === '3d-core' ? '★ APEX 3D Spatial Visual' : 'Interactive Showcase'}
             </span>
           </div>
 
           {/* Interactive Switchers */}
           <div className="flex items-center gap-1 bg-[#0A0A0C]/80 border border-white/10 rounded-xl p-1">
-            {(['vault', 'apparel', 'stage'] as const).map((tab) => (
+            {(['3d-core', 'vault', 'apparel', 'stage'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`text-[11px] font-mono uppercase px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                className={`text-[11px] font-mono uppercase px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer ${
                   activeTab === tab
                     ? 'bg-[#2D68FF] text-white shadow-[0_0_12px_rgba(45,104,255,0.5)] font-semibold'
                     : 'text-[#71717A] hover:text-[#F5F5F8]'
                 }`}
               >
-                {tab}
+                {tab === '3d-core' ? '★ 3D Shape' : tab}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Center Display Image Frame */}
-        <div className="relative z-10 my-5 rounded-2xl overflow-hidden aspect-[16/10] bg-[#070709] border border-white/[0.08] shadow-inner group/img">
-          <img
-            src={activeKitData.image}
-            alt={activeKitData.name}
-            className="w-full h-full object-cover transform group-hover/img:scale-105 transition-transform duration-700 ease-out"
-          />
-
-          {/* Contrast protection scrim */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0C] via-transparent to-transparent opacity-80" />
-
-          {/* Floating badge inside image */}
-          <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#0A0A0C]/85 backdrop-blur-md border border-white/15 text-[11px] font-mono text-[#5A8BFF] flex items-center gap-1.5 shadow-lg">
-            <Sparkles className="w-3 h-3 text-[#2D68FF]" />
-            {activeKitData.badge}
+        {/* Center Display Frame: 3D Visual OR Physical Kit Display */}
+        {activeTab === '3d-core' ? (
+          <div className="relative z-10 my-5">
+            <Hero3DVisual
+              posterFallback="/images/agency/ai-creative-lab.jpg"
+              splineSceneUrl="https://my.spline.design/particlenebula-ca85860d5c8fa440a33e9d8924b12368/"
+            />
           </div>
+        ) : (
+          <div className="relative z-10 my-5 rounded-2xl overflow-hidden aspect-[16/10] bg-[#070709] border border-white/[0.08] shadow-inner group/img">
+            <img
+              src={activeKitData.image}
+              alt={activeKitData.name}
+              className="w-full h-full object-cover transform group-hover/img:scale-105 transition-transform duration-700 ease-out"
+            />
 
-          {/* Floating live metric chip */}
-          <div className="absolute bottom-3 right-3 px-3 py-1 rounded-lg bg-[#0A0A0C]/90 backdrop-blur-md border border-[#2D68FF]/30 text-[11px] font-mono text-[#F5F5F8] flex items-center gap-1.5">
-            <Zap className="w-3 h-3 text-[#2D68FF]" />
-            {activeKitData.metric}
+            {/* Contrast protection scrim */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0C] via-transparent to-transparent opacity-80" />
+
+            {/* Floating badge inside image */}
+            <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#0A0A0C]/85 backdrop-blur-md border border-white/15 text-[11px] font-mono text-[#5A8BFF] flex items-center gap-1.5 shadow-lg">
+              <Sparkles className="w-3 h-3 text-[#2D68FF]" />
+              {activeKitData.badge}
+            </div>
+
+            {/* Floating live metric chip */}
+            <div className="absolute bottom-3 right-3 px-3 py-1 rounded-lg bg-[#0A0A0C]/90 backdrop-blur-md border border-[#2D68FF]/30 text-[11px] font-mono text-[#F5F5F8] flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-[#2D68FF]" />
+              {activeKitData.metric}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Kit Info & Quick Metrics */}
         <div className="relative z-10 space-y-3">
@@ -158,33 +201,14 @@ export const HeroCenterpiece: React.FC = () => {
             </div>
             <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
               <span className="block text-[10px] uppercase font-mono text-[#71717A]">Fulfillment</span>
-              <span className="text-xs font-semibold text-[#5A8BFF]">Insured Freight</span>
+              <span className="text-xs font-semibold text-[#5A8BFF]">Guaranteed</span>
             </div>
             <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-              <span className="block text-[10px] uppercase font-mono text-[#71717A]">Customization</span>
-              <span className="text-xs font-semibold text-emerald-400">100% On-Brand</span>
+              <span className="block text-[10px] uppercase font-mono text-[#71717A]">Inspection</span>
+              <span className="text-xs font-semibold text-white">White-Glove</span>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Orbiting Satellite Card 1: Rapid Deployment */}
-      <div className="hidden sm:flex absolute -bottom-5 -left-5 z-20 items-center gap-3 p-3.5 rounded-2xl bg-[#0B0D14]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_40px_rgba(0,0,0,0.9),0_0_25px_rgba(45,104,255,0.25)] transition-transform duration-300 hover:scale-105">
-        <div className="p-2.5 rounded-xl bg-[#2D68FF]/20 text-[#5A8BFF] border border-[#2D68FF]/40 shadow-[0_0_15px_rgba(45,104,255,0.3)]">
-          <Box className="w-4 h-4" />
-        </div>
-        <div>
-          <span className="text-xs font-bold text-[#F8F9FD] block font-mono">72h White-Glove Dispatch</span>
-          <span className="text-[10px] text-[#9FA5B9]">Direct to Venue or Headquarters</span>
-        </div>
-      </div>
-
-      {/* Orbiting Satellite Card 2: Certified Production */}
-      <div className="hidden sm:flex absolute -top-4 -right-4 z-20 items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0B0D14]/95 backdrop-blur-2xl border border-[#2D68FF]/40 shadow-[0_15px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(45,104,255,0.2)]">
-        <span className="w-2 h-2 rounded-full bg-[#5A8BFF] shadow-[0_0_8px_#2D68FF] animate-pulse" />
-        <span className="text-xs font-mono font-medium text-[#F8F9FD]">
-          Client Proof Approved
-        </span>
       </div>
     </div>
   );
