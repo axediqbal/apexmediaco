@@ -241,12 +241,29 @@ export async function submitOrder(orderInput: {
     notes: orderInput.notes
   };
 
+  const sanitizedCustomer = {
+    ...orderInput.customer,
+    companyName: orderInput.customer.companyName || (orderInput.customer as any).company || 'Enterprise Client',
+    postalCode: orderInput.customer.postalCode || (orderInput.customer as any).zipCode || (orderInput.customer as any).zip || '00000',
+    phone: orderInput.customer.phone || 'N/A',
+    state: orderInput.customer.state || 'N/A'
+  };
+
+  const sanitizedItems = (orderInput.items || []).map((it: any) => ({
+    productId: it.productId || it.id || 'prod_item',
+    productName: it.productName || it.name || 'APEX Collateral Item',
+    quantity: Number(it.quantity) || 1,
+    price: Number(it.price) || 0,
+    image: it.image || (Array.isArray(it.images) ? it.images[0] : '') || '/images/placeholder.jpg',
+    selectedVariants: it.selectedVariants || {}
+  }));
+
   if (isConnected && mode === 'mongodb') {
     try {
       const doc = await Order.create({
         orderNumber,
-        customer: orderInput.customer,
-        items: orderInput.items,
+        customer: sanitizedCustomer,
+        items: sanitizedItems,
         subtotal: orderInput.subtotal,
         shipping: orderInput.shipping,
         tax: orderInput.tax,
