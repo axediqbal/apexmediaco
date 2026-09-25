@@ -5,6 +5,7 @@ import { CartProvider } from '@/context/CartContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/cart/CartDrawer';
+import SmoothScrollProvider from '@/components/providers/SmoothScrollProvider';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-display',
@@ -53,14 +54,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} dark antialiased`}>
       <body className="bg-[#0A0A0C] text-[#F5F5F8] min-h-screen flex flex-col font-sans selection:bg-[#2D68FF]/30 selection:text-white">
-        <CartProvider>
-          <Navbar />
-          <main className="flex-1 w-full flex flex-col">
-            {children}
-          </main>
-          <CartDrawer />
-          <Footer />
-        </CartProvider>
+        <SmoothScrollProvider>
+          <CartProvider>
+            <Navbar />
+            <main className="flex-1 w-full flex flex-col">
+              {children}
+            </main>
+            <CartDrawer />
+            <Footer />
+          </CartProvider>
+        </SmoothScrollProvider>
       </body>
     </html>
   );

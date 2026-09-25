@@ -10,6 +10,8 @@ import GlassCard from '@/components/ui/GlassCard';
 import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import QuickSpecDrawer from '@/components/products/QuickSpecDrawer';
+import { Eye } from 'lucide-react';
 
 interface ProductCatalogProps {
   initialProducts: ProductItem[];
@@ -21,6 +23,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'rating'>('featured');
   const [addedId, setAddedId] = useState<string | null>(null);
+  const [specProduct, setSpecProduct] = useState<ProductItem | null>(null);
 
   const categories = ['All', 'Apparel', 'Event & Signage', 'VIP Kits', 'Digital Systems'];
 
@@ -249,24 +252,40 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
                           </span>
                         </div>
 
-                        <button
-                          onClick={(e) => handleQuickAdd(product, e)}
-                          disabled={isOutOfStock}
-                          aria-label={`Quick add ${product.name} to cart`}
-                          className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${
-                            isOutOfStock
-                              ? 'bg-white/[0.02] border-white/10 text-[#71717A] cursor-not-allowed opacity-50'
-                              : isJustAdded
-                              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                              : 'bg-[#2D68FF]/15 border-[#2D68FF]/40 text-[#5A8BFF] hover:bg-[#2D68FF] hover:text-white hover:shadow-[0_0_20px_rgba(45,104,255,0.4)]'
-                          }`}
-                        >
-                          {isJustAdded ? (
-                            <Check className="w-4 h-4 animate-in zoom-in" />
-                          ) : (
-                            <ShoppingBag className="w-4 h-4" />
-                          )}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSpecProduct(product);
+                            }}
+                            title="Inspect Technical Specs"
+                            aria-label={`Inspect ${product.name} specs`}
+                            className="p-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-[#A1A1B0] hover:text-white hover:border-[#2D68FF]/50 hover:bg-[#2D68FF]/10 transition-all cursor-pointer"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            onClick={(e) => handleQuickAdd(product, e)}
+                            disabled={isOutOfStock}
+                            aria-label={`Quick add ${product.name} to cart`}
+                            className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+                              isOutOfStock
+                                ? 'bg-white/[0.02] border-white/10 text-[#71717A] cursor-not-allowed opacity-50'
+                                : isJustAdded
+                                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                : 'bg-[#2D68FF]/15 border-[#2D68FF]/40 text-[#5A8BFF] hover:bg-[#2D68FF] hover:text-white hover:shadow-[0_0_20px_rgba(45,104,255,0.4)]'
+                            }`}
+                          >
+                            {isJustAdded ? (
+                              <Check className="w-4 h-4 animate-in zoom-in" />
+                            ) : (
+                              <ShoppingBag className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </GlassCard>
@@ -276,6 +295,12 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
           </div>
         )}
       </Container>
+
+      {/* Inline Quick Spec Inspection Drawer */}
+      <QuickSpecDrawer
+        product={specProduct}
+        onClose={() => setSpecProduct(null)}
+      />
     </div>
   );
 };

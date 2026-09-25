@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -8,6 +8,7 @@ export interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverEffect?: boolean;
   specular?: boolean;
   glow?: boolean;
+  spotlight?: boolean;
 }
 
 export const GlassCard: React.FC<GlassCardProps> = ({
@@ -16,10 +17,36 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   hoverEffect = true,
   specular = true,
   glow = false,
+  spotlight = true,
+  onMouseMove,
   ...props
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0, opacity: 0 });
+
+  const handlePointerMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (spotlight && cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      setMousePos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        opacity: 1,
+      });
+    }
+    if (onMouseMove) onMouseMove(e);
+  };
+
+  const handlePointerLeave = () => {
+    if (spotlight) {
+      setMousePos((prev) => ({ ...prev, opacity: 0 }));
+    }
+  };
+
   return (
     <div
+      ref={cardRef}
+      onMouseMove={handlePointerMove}
+      onMouseLeave={handlePointerLeave}
       className={twMerge(
         clsx(
           'relative rounded-2xl overflow-hidden',
@@ -34,6 +61,17 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       )}
       {...props}
     >
+      {/* Dynamic Cursor Spotlight Border Glow */}
+      {spotlight && (
+        <div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{
+            opacity: mousePos.opacity,
+            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(45, 104, 255, 0.22), transparent 70%)`,
+          }}
+        />
+      )}
+
       {/* Specular top highlight */}
       {specular && (
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
