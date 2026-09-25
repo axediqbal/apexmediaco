@@ -43,7 +43,8 @@ export const SEED_PRODUCTS: ProductItem[] = [
     category: 'Event & Signage',
     images: [
       'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80',
+      '/images/logistics/warehouse-pallets.jpg',
+      '/images/logistics/terminal-aerial.jpg',
       'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80'
     ],
     variants: [
@@ -74,7 +75,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     category: 'VIP Kits',
     images: [
       'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80',
+      '/images/logistics/terminal-night.jpg',
       'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80'
     ],
     variants: [
@@ -136,8 +137,8 @@ export const SEED_PRODUCTS: ProductItem[] = [
     category: 'Event & Signage',
     images: [
       'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80'
+      '/images/logistics/fleet-trucks.jpg',
+      '/images/logistics/port-cranes.jpg'
     ],
     variants: [
       { id: 'size_format', name: 'Pod Footprint', options: ['Standard 10x10ft', 'Expanded 10x20ft Dual Bay'] },

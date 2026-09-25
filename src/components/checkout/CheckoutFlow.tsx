@@ -559,6 +559,7 @@ export const CheckoutFlow: React.FC = () => {
                       duration: '3-5 Business Days',
                       price: shipping === 0 ? 'Free ($1500+ order)' : `$${shipping}`,
                       desc: 'Climate-controlled palletized courier delivery to corporate loading dock.',
+                      image: '/images/logistics/fleet-trucks.jpg',
                     },
                     {
                       id: 'white-glove',
@@ -566,6 +567,7 @@ export const CheckoutFlow: React.FC = () => {
                       duration: 'Guaranteed 72 Hours',
                       price: '+$150 USD',
                       desc: 'Direct handoff inside hotel suite, conference hall, or stage green room.',
+                      image: '/images/logistics/terminal-night.jpg',
                     },
                   ].map((opt) => (
                     <div
@@ -587,6 +589,12 @@ export const CheckoutFlow: React.FC = () => {
                         >
                           {shippingMethod === opt.id && <div className="w-2 h-2 rounded-full bg-white" />}
                         </div>
+
+                        {/* Logistics Photo Thumbnail */}
+                        <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 border border-white/10 hidden sm:block">
+                          <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
+                        </div>
+
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-bold text-[#F5F5F8]">{opt.name}</span>

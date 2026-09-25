@@ -188,6 +188,22 @@ export const BentoGrid: React.FC = () => {
                 <p className="text-sm text-[#9FA5B9] leading-relaxed">
                   Operating out of 3 regional logistics hubs (New York, Austin, San Francisco). We deliver directly to conference green rooms, hotel holding suites, or global remote teams with real-time temperature and location telemetry.
                 </p>
+
+                {/* Logistics Photography Window */}
+                <div className="relative aspect-[16/7] rounded-xl overflow-hidden my-3 border border-white/[0.08] group/img">
+                  <img
+                    src="/images/logistics/terminal-night.jpg"
+                    alt="APEX National Logistics Hub at Night"
+                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-70" />
+                  <div className="absolute bottom-2.5 left-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[11px] font-mono text-[#F8F9FD] bg-black/70 px-2 py-0.5 rounded backdrop-blur-md border border-white/10">
+                      NYC Metro Hub • Direct Intermodal Connection
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-white/[0.08] flex flex-wrap items-center gap-6 text-xs text-[#69708A]">

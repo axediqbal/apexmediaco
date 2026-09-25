@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '@/components/home/Hero';
 import BentoGrid from '@/components/home/BentoGrid';
+import LogisticsInfrastructure from '@/components/home/LogisticsInfrastructure';
 import FeaturedKits from '@/components/home/FeaturedKits';
 import StatsCounter from '@/components/home/StatsCounter';
 import Testimonials from '@/components/home/Testimonials';
@@ -16,6 +17,7 @@ export default async function HomePage() {
     <div className="flex flex-col w-full">
       <Hero />
       <BentoGrid />
+      <LogisticsInfrastructure />
       <FeaturedKits products={products} />
       <StatsCounter />
       <Testimonials />
