@@ -2,23 +2,39 @@
 
 /**
  * @file Hero3DVisual.tsx
- * @description Interactive 3D APEX VIP Client Onboarding Vault for Hero Section
+ * @description Ultra-Vibrant Interactive 3D APEX VIP Onboarding Vault for Hero Section
  * 
  * KIYA HORAHA HAI:
- * - Abstract black shape ki jagah APEX ka flagship physical product
- *   "VIP Onboarding Vault ($620)" 3D mein render hota hai.
- * - Anodized 6061-T6 titanium/aluminum finish with visible metallic specular highlights (no flat black blob!).
- * - Glowing Electric Cobalt laser parting seam, biometric lock scanner pad, aur APEX emblem plate.
- * - Interactive Pneumatic Damper: User click karke lid ko open/close kar sakta hai,
- *   jis se andar ka velvet foam nest aur encrypted brand recovery key reveal hoti hai!
- * - Cursor-reactive 3D lighting, drag-to-rotate controls, Spline scene toggle,
- *   aur prefers-reduced-motion / battery conservation support karta hai.
+ * - Pehle jo dark/black silhouette lag raha tha, usko completely transform kar diya hai:
+ *   1. TWO-TONE VIBRANT FINISH:
+ *      - Base Chassis: Luminous Electric Cobalt Blue (#2465FF) with high metallic sheen.
+ *      - Upper Lid: Gleaming Brushed Platinum-Silver (#D8E4FC) with icy specular reflections.
+ *      - Corners: Mirror Polished Chrome (#EEF5FF).
+ *      - Emblem: 24K Polished Imperial Gold (#FFD700) badge with cobalt neon chevron.
+ *   2. NEON LIGHTING & GLOWING ACCENTS:
+ *      - Glowing Cyan-Cobalt LED Laser Seam (#00F0FF, emissive intensity 4.5).
+ *      - Biometric Scanner Pad (#00FFFF) with glowing fingerprint sensor.
+ *   3. HOLOGRAPHIC STAGE PEDESTAL:
+ *      - Vault ke neeche rotating concentric neon light rings (#2D68FF & #00F0FF)
+ *        jo upward colored bounce light cast karti hain.
+ *   4. MULTI-COLOR STUDIO LIGHTING RIG:
+ *      - Ambient Light (4.0 intensity) + Pure White Key Light (5.5) +
+ *        Cobalt Side Light (6.0) + Cyan Rim Light (4.5) + Blue Stage Uplight (4.5).
+ *      - Koi bhi face kabhi bhi black nahi hogi!
+ *   5. COLORWAY THEME SWITCHER:
+ *      - User 1-click se 'Cobalt' (Blue/Silver), 'Gold' (24K Gold/Amber), ya 'Cyber' (Violet/Cyan)
+ *        presets switch kar sakta hai!
+ *   6. INTERACTIVE PNEUMATIC DAMPER:
+ *      - Click karne par lid piche smoothly lift hoti hai, revealing Royal Sapphire velvet
+ *        nest aur 24K Gold APEX Recovery Key!
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { Rotate3d, Box, Lock, Unlock, Sparkles, Layers, Sliders } from 'lucide-react';
+import { Rotate3d, Box, Lock, Unlock, Palette, Sparkles } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
+type Colorway = 'cobalt' | 'gold' | 'cyber';
 
 interface Hero3DVisualProps {
   posterFallback?: string;
@@ -32,6 +48,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mode, setMode] = useState<'three' | 'spline'>('three');
+  const [colorway, setColorway] = useState<Colorway>('cobalt');
   const [isLoading, setIsLoading] = useState(true);
   const [wireframeMode, setWireframeMode] = useState(false);
   const [isVaultOpen, setIsVaultOpen] = useState(false);
@@ -45,22 +62,133 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const rootGroupRef = useRef<THREE.Group | null>(null);
   const lidHingeGroupRef = useRef<THREE.Group | null>(null);
+  const stageRing1Ref = useRef<THREE.Mesh | null>(null);
+  const stageRing2Ref = useRef<THREE.Mesh | null>(null);
   const pointLightRef = useRef<THREE.PointLight | null>(null);
-  const materialsRef = useRef<THREE.Material[]>([]);
+  const materialsMapRef = useRef<{
+    baseMat?: THREE.MeshPhysicalMaterial;
+    lidMat?: THREE.MeshPhysicalMaterial;
+    cornerMat?: THREE.MeshStandardMaterial;
+    seamMat?: THREE.MeshStandardMaterial;
+    scannerMat?: THREE.MeshStandardMaterial;
+    emblemMat?: THREE.MeshStandardMaterial;
+    velvetMat?: THREE.MeshStandardMaterial;
+    keyMat?: THREE.MeshStandardMaterial;
+    stage1Mat?: THREE.MeshStandardMaterial;
+    stage2Mat?: THREE.MeshStandardMaterial;
+  }>({});
   const isVaultOpenRef = useRef<boolean>(false);
 
-  // Sync ref with state for animation loop
+  // Sync ref with state
   useEffect(() => {
     isVaultOpenRef.current = isVaultOpen;
   }, [isVaultOpen]);
+
+  // Update materials when colorway changes
+  useEffect(() => {
+    const mats = materialsMapRef.current;
+    if (!mats.baseMat || !mats.lidMat) return;
+
+    if (colorway === 'cobalt') {
+      // Cobalt Signature: Electric Cobalt + Platinum Silver + Cyan Neon + Gold Emblem
+      mats.baseMat.color.setHex(0x2062ff);
+      mats.lidMat.color.setHex(0xd0e0fb);
+      if (mats.cornerMat) mats.cornerMat.color.setHex(0xeef4ff);
+      if (mats.seamMat) {
+        mats.seamMat.color.setHex(0x00f0ff);
+        mats.seamMat.emissive.setHex(0x00f0ff);
+      }
+      if (mats.scannerMat) {
+        mats.scannerMat.color.setHex(0x00ffff);
+        mats.scannerMat.emissive.setHex(0x00ffff);
+      }
+      if (mats.emblemMat) {
+        mats.emblemMat.color.setHex(0xffd700);
+        mats.emblemMat.emissive.setHex(0xb8860b);
+      }
+      if (mats.velvetMat) mats.velvetMat.color.setHex(0x12244e);
+      if (mats.keyMat) {
+        mats.keyMat.color.setHex(0xffc700);
+        mats.keyMat.emissive.setHex(0x1f47bf);
+      }
+      if (mats.stage1Mat) {
+        mats.stage1Mat.color.setHex(0x2d68ff);
+        mats.stage1Mat.emissive.setHex(0x2d68ff);
+      }
+      if (mats.stage2Mat) {
+        mats.stage2Mat.color.setHex(0x00f0ff);
+        mats.stage2Mat.emissive.setHex(0x00f0ff);
+      }
+    } else if (colorway === 'gold') {
+      // Gold Luxury: Imperial 24K Gold + Midnight Obsidian + Signal Amber Neon
+      mats.baseMat.color.setHex(0x181e2e);
+      mats.lidMat.color.setHex(0xefb810);
+      if (mats.cornerMat) mats.cornerMat.color.setHex(0xffd700);
+      if (mats.seamMat) {
+        mats.seamMat.color.setHex(0xff9500);
+        mats.seamMat.emissive.setHex(0xff9500);
+      }
+      if (mats.scannerMat) {
+        mats.scannerMat.color.setHex(0xffb800);
+        mats.scannerMat.emissive.setHex(0xffb800);
+      }
+      if (mats.emblemMat) {
+        mats.emblemMat.color.setHex(0xffffff);
+        mats.emblemMat.emissive.setHex(0x888888);
+      }
+      if (mats.velvetMat) mats.velvetMat.color.setHex(0x2e0c15);
+      if (mats.keyMat) {
+        mats.keyMat.color.setHex(0xffffff);
+        mats.keyMat.emissive.setHex(0xff9500);
+      }
+      if (mats.stage1Mat) {
+        mats.stage1Mat.color.setHex(0xff9500);
+        mats.stage1Mat.emissive.setHex(0xff9500);
+      }
+      if (mats.stage2Mat) {
+        mats.stage2Mat.color.setHex(0xffd700);
+        mats.stage2Mat.emissive.setHex(0xffd700);
+      }
+    } else if (colorway === 'cyber') {
+      // Cyber Neo: Cyber Violet + Electric Cyan + Neon Pink/Magenta
+      mats.baseMat.color.setHex(0x791ae5);
+      mats.lidMat.color.setHex(0x00e5ff);
+      if (mats.cornerMat) mats.cornerMat.color.setHex(0xff007f);
+      if (mats.seamMat) {
+        mats.seamMat.color.setHex(0xff007f);
+        mats.seamMat.emissive.setHex(0xff007f);
+      }
+      if (mats.scannerMat) {
+        mats.scannerMat.color.setHex(0x00f0ff);
+        mats.scannerMat.emissive.setHex(0x00f0ff);
+      }
+      if (mats.emblemMat) {
+        mats.emblemMat.color.setHex(0xffd700);
+        mats.emblemMat.emissive.setHex(0xff007f);
+      }
+      if (mats.velvetMat) mats.velvetMat.color.setHex(0x20003c);
+      if (mats.keyMat) {
+        mats.keyMat.color.setHex(0x00f0ff);
+        mats.keyMat.emissive.setHex(0xff007f);
+      }
+      if (mats.stage1Mat) {
+        mats.stage1Mat.color.setHex(0xff007f);
+        mats.stage1Mat.emissive.setHex(0xff007f);
+      }
+      if (mats.stage2Mat) {
+        mats.stage2Mat.color.setHex(0x00f0ff);
+        mats.stage2Mat.emissive.setHex(0x00f0ff);
+      }
+    }
+  }, [colorway]);
 
   // Toggle wireframe
   const toggleWireframe = useCallback(() => {
     setWireframeMode((prev) => {
       const next = !prev;
-      materialsRef.current.forEach((mat) => {
-        if ('wireframe' in mat) {
-          (mat as THREE.MeshStandardMaterial).wireframe = next;
+      Object.values(materialsMapRef.current).forEach((mat) => {
+        if (mat && 'wireframe' in mat) {
+          mat.wireframe = next;
         }
       });
       return next;
@@ -85,9 +213,9 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // 2. Camera: Positioned with gentle isometric perspective
+    // 2. Camera: Positioned with clear 3/4 perspective
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 2.4, 6.2);
+    camera.position.set(0, 2.3, 6.2);
     camera.lookAt(0, 0, 0);
 
     // 3. Renderer with Mobile Optimization
@@ -101,31 +229,36 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.45;
     rendererRef.current = renderer;
 
-    // 4. Studio Lighting Rig (Ensures rich metallic reflections without flat black spots)
-    // Ambient fill
-    const ambientLight = new THREE.AmbientLight(0x242b3d, 2.5);
+    // 4. STUDIO LIGHTING RIG — MULTI-COLORED, VIBRANT, ZERO BLACK BLOTS!
+    // A. Luminous Ambient Light so every shadow retains rich cobalt tone
+    const ambientLight = new THREE.AmbientLight(0x384d75, 4.0);
     scene.add(ambientLight);
 
-    // Main Studio Key Light (Pure White Specular)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 4.5);
-    keyLight.position.set(5, 7, 5);
+    // B. Studio Key Light (Pure White Top-Front Specular)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 5.5);
+    keyLight.position.set(6, 8, 6);
     scene.add(keyLight);
 
-    // Secondary Electric Cobalt Rim Light (Back-Side Glow)
-    const rimLight = new THREE.DirectionalLight(0x2d68ff, 5.0);
-    rimLight.position.set(-5, 4, -4);
+    // C. Saturated Electric Cobalt Side Light
+    const cobaltLight = new THREE.DirectionalLight(0x2d68ff, 6.5);
+    cobaltLight.position.set(-6, 5, 4);
+    scene.add(cobaltLight);
+
+    // D. Saturated Cyan Rim Light (from behind-right)
+    const rimLight = new THREE.DirectionalLight(0x00e5ff, 4.5);
+    rimLight.position.set(4, 5, -5);
     scene.add(rimLight);
 
-    // Underside Cool Fill Light
-    const fillLight = new THREE.DirectionalLight(0x6b8afd, 2.2);
-    fillLight.position.set(0, -5, 4);
-    scene.add(fillLight);
+    // E. Upward Stage Glow Light (illuminating the base from underneath)
+    const upLight = new THREE.DirectionalLight(0x3872ff, 4.5);
+    upLight.position.set(0, -6, 2);
+    scene.add(upLight);
 
-    // Mouse-interactive dynamic point light
-    const pointLight = new THREE.PointLight(0x5a8bff, 7, 12);
+    // F. Mouse-interactive dynamic point light
+    const pointLight = new THREE.PointLight(0x60a5fa, 8, 14);
     pointLight.position.set(0, 2, 4);
     scene.add(pointLight);
     pointLightRef.current = pointLight;
@@ -138,69 +271,108 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     rootGroupRef.current = rootGroup;
     scene.add(rootGroup);
 
-    materialsRef.current = [];
-
-    // --- MATERIALS ---
-    // A. Brushed Anodized Titanium (Metallic slate with smooth specular)
-    const titaniumMat = new THREE.MeshPhysicalMaterial({
-      color: 0x464e62,
-      metalness: 0.88,
-      roughness: 0.22,
-      clearcoat: 0.85,
-      clearcoatRoughness: 0.15,
-      reflectivity: 0.9,
-      wireframe: wireframeMode,
-    });
-    materialsRef.current.push(titaniumMat);
-
-    // B. Stealth Obsidian Armor Corners
-    const stealthArmorMat = new THREE.MeshStandardMaterial({
-      color: 0x181a24,
-      metalness: 0.92,
+    // --- MATERIALS WITH VIBRANT SATURATED BASE COLORS ---
+    // A. Base Chassis: Saturated Luminous Electric Cobalt Blue
+    const baseMat = new THREE.MeshPhysicalMaterial({
+      color: 0x2062ff,
+      metalness: 0.45, // Lower metalness prevents dark reflections, gives vibrant body color!
       roughness: 0.18,
+      clearcoat: 0.95,
+      clearcoatRoughness: 0.1,
+      reflectivity: 0.95,
       wireframe: wireframeMode,
     });
-    materialsRef.current.push(stealthArmorMat);
 
-    // C. Glowing Electric Cobalt LED Laser Seam
-    const cobaltLedMat = new THREE.MeshStandardMaterial({
-      color: 0x2d68ff,
-      emissive: 0x2d68ff,
-      emissiveIntensity: 3.5,
-      roughness: 0.1,
+    // B. Upper Lid: Gleaming Brushed Platinum-Silver with Icy Specular
+    const lidMat = new THREE.MeshPhysicalMaterial({
+      color: 0xd0e0fb,
+      metalness: 0.6,
+      roughness: 0.15,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
+      reflectivity: 0.95,
+      wireframe: wireframeMode,
+    });
+
+    // C. Mirror Polished Chrome Corner Pillars
+    const cornerMat = new THREE.MeshStandardMaterial({
+      color: 0xeef4ff,
+      metalness: 0.85,
+      roughness: 0.08,
+      wireframe: wireframeMode,
+    });
+
+    // D. Glowing Cyan-Cobalt LED Laser Seam
+    const seamMat = new THREE.MeshStandardMaterial({
+      color: 0x00f0ff,
+      emissive: 0x00f0ff,
+      emissiveIntensity: 4.5,
+      roughness: 0.05,
+      metalness: 0.2,
+      wireframe: wireframeMode,
+    });
+
+    // E. Biometric Cyan Scanner Glass
+    const scannerMat = new THREE.MeshStandardMaterial({
+      color: 0x00ffff,
+      emissive: 0x00ffff,
+      emissiveIntensity: 4.0,
+      roughness: 0.05,
       metalness: 0.3,
       wireframe: wireframeMode,
     });
-    materialsRef.current.push(cobaltLedMat);
 
-    // D. Biometric Cyan Scanner Glass
-    const scannerGlassMat = new THREE.MeshStandardMaterial({
-      color: 0x00e5ff,
-      emissive: 0x00e5ff,
-      emissiveIntensity: 2.8,
-      roughness: 0.05,
-      metalness: 0.5,
+    // F. Top APEX Emblem: 24K Polished Gold Badge
+    const emblemMat = new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      emissive: 0xb8860b,
+      emissiveIntensity: 0.3,
+      metalness: 0.95,
+      roughness: 0.12,
       wireframe: wireframeMode,
     });
-    materialsRef.current.push(scannerGlassMat);
 
-    // E. Velvet Interior Foam Nest
+    // G. Velvet Interior Foam Nest (Royal Sapphire Blue)
     const velvetMat = new THREE.MeshStandardMaterial({
-      color: 0x0c0e14,
+      color: 0x12244e,
       roughness: 0.95,
       metalness: 0.05,
       wireframe: wireframeMode,
     });
-    materialsRef.current.push(velvetMat);
 
-    // F. Polished Chrome Hinges
-    const chromeMat = new THREE.MeshStandardMaterial({
-      color: 0xd0d8e8,
-      metalness: 0.98,
-      roughness: 0.08,
-      wireframe: wireframeMode,
+    // H. Inside Vault: 24K Gold Bar APEX Encrypted Key
+    const keyMat = new THREE.MeshStandardMaterial({
+      color: 0xffc700,
+      emissive: 0x1f47bf,
+      emissiveIntensity: 0.6,
+      metalness: 0.95,
+      roughness: 0.15,
     });
-    materialsRef.current.push(chromeMat);
+
+    // I. Stage Pedestal Rings
+    const stage1Mat = new THREE.MeshStandardMaterial({
+      color: 0x2d68ff,
+      emissive: 0x2d68ff,
+      emissiveIntensity: 3.5,
+    });
+    const stage2Mat = new THREE.MeshStandardMaterial({
+      color: 0x00f0ff,
+      emissive: 0x00f0ff,
+      emissiveIntensity: 3.0,
+    });
+
+    materialsMapRef.current = {
+      baseMat,
+      lidMat,
+      cornerMat,
+      seamMat,
+      scannerMat,
+      emblemMat,
+      velvetMat,
+      keyMat,
+      stage1Mat,
+      stage2Mat,
+    };
 
     // --- VAULT BASE (LOWER CHASSIS) ---
     const baseGroup = new THREE.Group();
@@ -208,7 +380,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 
     // Main base box
     const baseGeo = new THREE.BoxGeometry(3.2, 0.9, 2.2);
-    const baseMesh = new THREE.Mesh(baseGeo, titaniumMat);
+    const baseMesh = new THREE.Mesh(baseGeo, baseMat);
     baseMesh.position.y = -0.45;
     baseGroup.add(baseMesh);
 
@@ -218,17 +390,10 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     interiorMesh.position.y = 0.01;
     baseGroup.add(interiorMesh);
 
-    // Inside Vault: Encrypted APEX Recovery Key (Gold/Cobalt VIP Artifact)
-    const keyGeo = new THREE.BoxGeometry(0.85, 0.06, 0.35);
-    const keyMat = new THREE.MeshStandardMaterial({
-      color: 0x2d68ff,
-      emissive: 0x1f47bf,
-      emissiveIntensity: 1.2,
-      metalness: 0.95,
-      roughness: 0.15,
-    });
+    // Encrypted APEX Recovery Key (Gold VIP Artifact)
+    const keyGeo = new THREE.BoxGeometry(0.85, 0.08, 0.35);
     const keyMesh = new THREE.Mesh(keyGeo, keyMat);
-    keyMesh.position.set(0, 0.05, 0);
+    keyMesh.position.set(0, 0.06, 0);
     keyMesh.rotation.y = 0.25;
     baseGroup.add(keyMesh);
 
@@ -241,112 +406,129 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     ];
     cornerPositions.forEach(([cx, cy, cz]) => {
       const cornerGeo = new THREE.BoxGeometry(0.2, 0.92, 0.2);
-      const cornerMesh = new THREE.Mesh(cornerGeo, stealthArmorMat);
+      const cornerMesh = new THREE.Mesh(cornerGeo, cornerMat);
       cornerMesh.position.set(cx, cy, cz);
       baseGroup.add(cornerMesh);
     });
 
-    // Glowing Cobalt Perimeter Seam (Base Top Rim)
-    const seamGeo = new THREE.BoxGeometry(3.24, 0.035, 2.24);
-    const seamMesh = new THREE.Mesh(seamGeo, cobaltLedMat);
+    // Glowing Cobalt-Cyan Perimeter Seam (Base Top Rim)
+    const seamGeo = new THREE.BoxGeometry(3.24, 0.045, 2.24);
+    const seamMesh = new THREE.Mesh(seamGeo, seamMat);
     seamMesh.position.y = 0.01;
     baseGroup.add(seamMesh);
 
     // Front Biometric Roller Lock Housing on Base
     const lockHousingGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.08, 32);
-    const lockHousing = new THREE.Mesh(lockHousingGeo, stealthArmorMat);
+    const lockHousing = new THREE.Mesh(lockHousingGeo, cornerMat);
     lockHousing.rotation.x = Math.PI / 2;
     lockHousing.position.set(0, -0.25, 1.12);
     baseGroup.add(lockHousing);
 
     // Biometric Scanner Glowing Ring
-    const scannerRingGeo = new THREE.TorusGeometry(0.2, 0.025, 16, 32);
-    const scannerRing = new THREE.Mesh(scannerRingGeo, scannerGlassMat);
+    const scannerRingGeo = new THREE.TorusGeometry(0.2, 0.03, 16, 32);
+    const scannerRing = new THREE.Mesh(scannerRingGeo, scannerMat);
     scannerRing.position.set(0, -0.25, 1.16);
     baseGroup.add(scannerRing);
 
     // Biometric Center Sensor
     const sensorGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.02, 32);
-    const sensorMesh = new THREE.Mesh(sensorGeo, cobaltLedMat);
+    const sensorMesh = new THREE.Mesh(sensorGeo, seamMat);
     sensorMesh.rotation.x = Math.PI / 2;
     sensorMesh.position.set(0, -0.25, 1.16);
     baseGroup.add(sensorMesh);
 
     // Rear Chrome Hinges
-    const hinge1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), chromeMat);
+    const hinge1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), cornerMat);
     hinge1.rotation.z = Math.PI / 2;
     hinge1.position.set(-0.9, 0.02, -1.12);
     baseGroup.add(hinge1);
 
-    const hinge2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), chromeMat);
+    const hinge2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), cornerMat);
     hinge2.rotation.z = Math.PI / 2;
     hinge2.position.set(0.9, 0.02, -1.12);
     baseGroup.add(hinge2);
 
     // --- VAULT LID (UPPER PNEUMATIC CHASSIS) ---
-    // The hinge pivot is located at the top rear edge: y = 0.02, z = -1.1
     const lidHingeGroup = new THREE.Group();
     lidHingeGroup.position.set(0, 0.02, -1.1);
     lidHingeGroupRef.current = lidHingeGroup;
     rootGroup.add(lidHingeGroup);
 
-    // Container for lid geometry relative to the hinge pivot
     const lidContent = new THREE.Group();
-    lidContent.position.set(0, 0, 1.1); // Offset back to center
+    lidContent.position.set(0, 0, 1.1);
     lidHingeGroup.add(lidContent);
 
-    // Lid Main Box
+    // Lid Main Box (Brushed Platinum-Silver)
     const lidGeo = new THREE.BoxGeometry(3.2, 0.65, 2.2);
-    const lidMesh = new THREE.Mesh(lidGeo, titaniumMat);
+    const lidMesh = new THREE.Mesh(lidGeo, lidMat);
     lidMesh.position.y = 0.325;
     lidContent.add(lidMesh);
 
     // Lid Armor Corner Pillars
     cornerPositions.forEach(([cx, _, cz]) => {
       const lidCornerGeo = new THREE.BoxGeometry(0.2, 0.66, 0.2);
-      const lidCornerMesh = new THREE.Mesh(lidCornerGeo, stealthArmorMat);
+      const lidCornerMesh = new THREE.Mesh(lidCornerGeo, cornerMat);
       lidCornerMesh.position.set(cx, 0.325, cz);
       lidContent.add(lidCornerMesh);
     });
 
-    // Top APEX Monogram Inlay Plate
-    const emblemPlateGeo = new THREE.BoxGeometry(1.5, 0.03, 1.0);
-    const emblemPlate = new THREE.Mesh(emblemPlateGeo, stealthArmorMat);
+    // Top APEX Monogram Inlay Plate (Gold Badge)
+    const emblemPlateGeo = new THREE.BoxGeometry(1.6, 0.035, 1.1);
+    const emblemPlate = new THREE.Mesh(emblemPlateGeo, emblemMat);
     emblemPlate.position.set(0, 0.66, 0);
     lidContent.add(emblemPlate);
 
     // Laser-Etched Glowing APEX Geometric Monogram
-    const logoSymbolGeo = new THREE.TorusGeometry(0.28, 0.03, 16, 3);
-    const logoSymbol = new THREE.Mesh(logoSymbolGeo, cobaltLedMat);
+    const logoSymbolGeo = new THREE.TorusGeometry(0.3, 0.035, 16, 3);
+    const logoSymbol = new THREE.Mesh(logoSymbolGeo, seamMat);
     logoSymbol.rotation.x = Math.PI / 2;
     logoSymbol.rotation.z = Math.PI;
-    logoSymbol.position.set(0, 0.68, 0);
+    logoSymbol.position.set(0, 0.685, 0);
     lidContent.add(logoSymbol);
 
-    // Top Chamfer Accent Lines (Electric Cobalt)
-    const accentLine1 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.02, 0.03), cobaltLedMat);
-    accentLine1.position.set(0, 0.66, -0.65);
+    // Top Chamfer Accent Lines (Electric Cyan Neon)
+    const accentLine1 = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.025, 0.035), seamMat);
+    accentLine1.position.set(0, 0.66, -0.68);
     lidContent.add(accentLine1);
 
-    const accentLine2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.02, 0.03), cobaltLedMat);
-    accentLine2.position.set(0, 0.66, 0.65);
+    const accentLine2 = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.025, 0.035), seamMat);
+    accentLine2.position.set(0, 0.66, 0.68);
     lidContent.add(accentLine2);
 
+    // --- HOLOGRAPHIC PROJECTION STAGE PEDESTAL BENEATH VAULT ---
+    const stageGroup = new THREE.Group();
+    stageGroup.position.y = -1.15;
+    rootGroup.add(stageGroup);
+
+    // Outer Neon Projection Ring
+    const stageRing1Geo = new THREE.TorusGeometry(2.35, 0.03, 16, 64);
+    const stageRing1 = new THREE.Mesh(stageRing1Geo, stage1Mat);
+    stageRing1.rotation.x = Math.PI / 2;
+    stageGroup.add(stageRing1);
+    stageRing1Ref.current = stageRing1;
+
+    // Inner Neon Projection Ring
+    const stageRing2Geo = new THREE.TorusGeometry(1.65, 0.025, 16, 64);
+    const stageRing2 = new THREE.Mesh(stageRing2Geo, stage2Mat);
+    stageRing2.rotation.x = Math.PI / 2;
+    stageGroup.add(stageRing2);
+    stageRing2Ref.current = stageRing2;
+
     // Subtle Ambient Floating Dust Particles around Vault
-    const particleCount = isMobile ? 30 : 60;
+    const particleCount = isMobile ? 35 : 70;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      particlePositions[i * 3] = (Math.random() - 0.5) * 6;
-      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 3;
-      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 5;
+      particlePositions[i * 3] = (Math.random() - 0.5) * 6.5;
+      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 3.5;
+      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 5.5;
     }
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
-      color: 0x5a8bff,
-      size: 0.035,
+      color: 0x60a5fa,
+      size: 0.04,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.75,
     });
     const dustParticles = new THREE.Points(particleGeo, particleMat);
     rootGroup.add(dustParticles);
@@ -378,7 +560,6 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-      // Normalized coordinates [-1, 1]
       const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -(((clientY - rect.top) / rect.height) * 2 - 1);
       mouseRef.current.targetX = nx;
@@ -451,6 +632,10 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         lidHingeGroupRef.current.rotation.x += (targetAngle - lidHingeGroupRef.current.rotation.x) * 0.08;
       }
 
+      // Rotating concentric holographic stage rings
+      if (stageRing1Ref.current) stageRing1Ref.current.rotation.z = elapsed * 0.3;
+      if (stageRing2Ref.current) stageRing2Ref.current.rotation.z = -elapsed * 0.45;
+
       // Floating dust particles drift
       dustParticles.rotation.y = elapsed * 0.05;
 
@@ -471,59 +656,104 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       window.removeEventListener('touchmove', handlePointerMove);
       window.removeEventListener('touchend', handlePointerUp);
 
-      // Dispose Three.js objects
       renderer.dispose();
       baseGeo.dispose();
       interiorGeo.dispose();
       keyGeo.dispose();
       lidGeo.dispose();
       particleGeo.dispose();
-      materialsRef.current.forEach((m) => m.dispose());
+      Object.values(materialsMapRef.current).forEach((m) => m?.dispose());
     };
   }, [mode, wireframeMode, prefersReduced]);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-3xl bg-[#090A0F]/90 border border-white/[0.12] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9),0_0_50px_rgba(45,104,255,0.18)] overflow-hidden group select-none"
+      className="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-3xl bg-gradient-to-b from-[#0F1424] via-[#090D18] to-[#060810] border border-[#2D68FF]/30 shadow-[0_30px_90px_-20px_rgba(0,0,0,0.95),0_0_60px_rgba(45,104,255,0.25)] overflow-hidden group select-none"
     >
-      {/* Dynamic ambient background glow */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#2D68FF]/15 via-transparent to-[#2D68FF]/5 pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[#2D68FF]/20 rounded-full blur-[90px] pointer-events-none" />
+      {/* Dynamic colorful ambient background aura */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#2D68FF]/30 via-transparent to-[#00F0FF]/20 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#2D68FF]/30 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#2D68FF]/15 to-transparent pointer-events-none" />
 
       {/* Top Visual HUD Toolbar */}
       <div className="absolute top-3 left-3 right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0B10]/85 backdrop-blur-md border border-white/10 shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-[#2D68FF] animate-pulse" />
-          <span className="text-[11px] font-mono text-[#F8F9FD] tracking-wider uppercase">
-            {mode === 'three' ? 'APEX VIP Onboarding Vault (3D Model)' : 'Spline 3D Scene'}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#070A14]/90 backdrop-blur-md border border-[#2D68FF]/40 shadow-[0_0_15px_rgba(45,104,255,0.3)]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#00F0FF] animate-pulse shadow-[0_0_8px_#00F0FF]" />
+          <span className="text-[11px] font-mono text-[#F8F9FD] tracking-wider uppercase font-semibold">
+            {mode === 'three' ? 'APEX VIP Vault (3D Milled Spec)' : 'Spline 3D Scene'}
           </span>
         </div>
 
-        {/* Mode & Action Buttons */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#0A0B10]/85 backdrop-blur-md border border-white/10 shadow-lg">
+        {/* Colorway & Action Controls */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#070A14]/90 backdrop-blur-md border border-white/15 shadow-xl">
           {mode === 'three' && (
-            <button
-              onClick={() => setIsVaultOpen((prev) => !prev)}
-              title="Click to Open/Close Vault Lid"
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                isVaultOpen
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
-                  : 'bg-[#2D68FF] text-white font-semibold shadow-[0_0_10px_rgba(45,104,255,0.5)]'
-              }`}
-            >
-              {isVaultOpen ? (
-                <>
-                  <Unlock className="w-3 h-3 text-emerald-400" />
-                  <span>Vault Open</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-3 h-3 text-white" />
-                  <span>Open Vault</span>
-                </>
-              )}
-            </button>
+            <>
+              {/* Colorway Switcher Buttons */}
+              <div className="flex items-center gap-1 pr-1 mr-1 border-r border-white/10">
+                <button
+                  onClick={() => setColorway('cobalt')}
+                  title="Cobalt Signature Colorway"
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-mono transition-all cursor-pointer flex items-center gap-1 ${
+                    colorway === 'cobalt'
+                      ? 'bg-[#2D68FF] text-white shadow-[0_0_10px_#2D68FF] font-bold'
+                      : 'text-[#858B9E] hover:text-white'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#00F0FF]" />
+                  <span>Cobalt</span>
+                </button>
+
+                <button
+                  onClick={() => setColorway('gold')}
+                  title="24K Gold Luxury Colorway"
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-mono transition-all cursor-pointer flex items-center gap-1 ${
+                    colorway === 'gold'
+                      ? 'bg-[#EFB810] text-black shadow-[0_0_10px_#EFB810] font-bold'
+                      : 'text-[#858B9E] hover:text-white'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#FFD700]" />
+                  <span>Gold</span>
+                </button>
+
+                <button
+                  onClick={() => setColorway('cyber')}
+                  title="Cyber Violet Colorway"
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-mono transition-all cursor-pointer flex items-center gap-1 ${
+                    colorway === 'cyber'
+                      ? 'bg-[#FF007F] text-white shadow-[0_0_10px_#FF007F] font-bold'
+                      : 'text-[#858B9E] hover:text-white'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#00F0FF]" />
+                  <span>Cyber</span>
+                </button>
+              </div>
+
+              {/* Open / Close Vault Toggle */}
+              <button
+                onClick={() => setIsVaultOpen((prev) => !prev)}
+                title="Click to Open/Close Vault Lid"
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                  isVaultOpen
+                    ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                    : 'bg-[#2D68FF] text-white font-semibold shadow-[0_0_15px_rgba(45,104,255,0.6)]'
+                }`}
+              >
+                {isVaultOpen ? (
+                  <>
+                    <Unlock className="w-3 h-3 text-emerald-300" />
+                    <span>Lid Open</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3 h-3 text-white" />
+                    <span>Open Vault</span>
+                  </>
+                )}
+              </button>
+            </>
           )}
 
           <button
@@ -531,12 +761,13 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
             title="Switch to Three.js Vault Model"
             className={`px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer ${
               mode === 'three'
-                ? 'bg-white/15 text-white font-semibold'
+                ? 'bg-white/20 text-white font-semibold'
                 : 'text-[#858B9E] hover:text-white'
             }`}
           >
-            3D Vault
+            3D Model
           </button>
+
           <button
             onClick={() => setMode('spline')}
             title="Switch to Spline Scene"
@@ -548,6 +779,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
           >
             Spline
           </button>
+
           {mode === 'three' && (
             <button
               onClick={toggleWireframe}
@@ -566,7 +798,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 
       {/* Reduced Motion OR Static Poster Fallback */}
       {prefersReduced ? (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#090A0F]">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#070A14]">
           <img
             src={posterFallback}
             alt="APEX 3D Vault Poster"
@@ -613,22 +845,23 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 
       {/* Loading Overlay */}
       {isLoading && !prefersReduced && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#090A0F] gap-3">
-          <div className="w-10 h-10 rounded-full border-2 border-[#2D68FF]/30 border-t-[#2D68FF] animate-spin" />
-          <div className="text-xs font-mono text-[#858B9E] tracking-widest uppercase">
-            Fabricating 3D Vault Chassis...
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#070A14] gap-3">
+          <div className="w-10 h-10 rounded-full border-2 border-[#2D68FF]/30 border-t-[#00F0FF] animate-spin shadow-[0_0_20px_#2D68FF]" />
+          <div className="text-xs font-mono text-[#A1B5E8] tracking-widest uppercase">
+            Fabricating Titanium Vault...
           </div>
         </div>
       )}
 
       {/* Bottom Telemetry HUD */}
       <div className="absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#858B9E] bg-black/65 backdrop-blur-md px-3 py-1 rounded-lg border border-white/[0.08]">
-          <Rotate3d className="w-3.5 h-3.5 text-[#2D68FF]" />
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[#A1B5E8] bg-black/75 backdrop-blur-md px-3 py-1 rounded-lg border border-[#2D68FF]/30 shadow-lg">
+          <Rotate3d className="w-3.5 h-3.5 text-[#00F0FF]" />
           <span>Drag to Rotate • Click Vault to Open Lid</span>
         </div>
-        <div className="text-[10px] font-mono text-[#5A8BFF] bg-black/65 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#2D68FF]/30 hidden sm:block">
-          6061-T6 Anodized Milled Spec
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[#00F0FF] bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#00F0FF]/40 shadow-[0_0_12px_rgba(0,240,255,0.3)] hidden sm:flex">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-ping" />
+          <span>Electric Cobalt + Platinum Milled</span>
         </div>
       </div>
     </div>
