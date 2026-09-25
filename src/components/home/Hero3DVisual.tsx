@@ -86,69 +86,66 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     }
 
     if (targetPreset === 'platinum-gold') {
-      // 1. Executive Platinum Stainless Steel & 24K Imperial Gold (Iconic Bank Vault)
-      matChassisRef.current.color.setHex(0xe0e7ee);
-      matChassisRef.current.metalness = 0.80;
-      matChassisRef.current.roughness = 0.20;
-      matChassisRef.current.clearcoat = 0.5;
+      // 1. Executive Gunmetal Titanium Steel & 24K Imperial Gold (Iconic Heavy Safe)
+      matChassisRef.current.color.setHex(0x4f5869);
+      matChassisRef.current.metalness = 0.85;
+      matChassisRef.current.roughness = 0.32;
 
-      matDoorRef.current.color.setHex(0xf4f7fa);
-      matDoorRef.current.metalness = 0.85;
-      matDoorRef.current.roughness = 0.16;
+      matDoorRef.current.color.setHex(0x64748b);
+      matDoorRef.current.metalness = 0.88;
+      matDoorRef.current.roughness = 0.25;
 
-      matInsetRef.current.color.setHex(0xe5b838);
-      matInsetRef.current.metalness = 0.90;
-      matInsetRef.current.roughness = 0.22;
+      matInsetRef.current.color.setHex(0xd4af37);
+      matInsetRef.current.metalness = 0.92;
+      matInsetRef.current.roughness = 0.20;
 
-      matWheelRef.current.color.setHex(0xfbbf24);
-      matWheelRef.current.metalness = 0.96;
+      matWheelRef.current.color.setHex(0xf59e0b);
+      matWheelRef.current.metalness = 0.98;
       matWheelRef.current.roughness = 0.08;
 
       matChromeRef.current.color.setHex(0xffffff);
-      matChromeRef.current.metalness = 0.99;
+      matChromeRef.current.metalness = 1.0;
       matChromeRef.current.roughness = 0.03;
     } else if (targetPreset === 'champagne-white') {
-      // 2. Pearlescent High-Gloss Executive White & Champagne Gold (Swiss Luxury Watch Safe)
-      matChassisRef.current.color.setHex(0xf8fafc);
-      matChassisRef.current.metalness = 0.35;
-      matChassisRef.current.roughness = 0.12;
-      matChassisRef.current.clearcoat = 1.0;
+      // 2. Brushed Platinum Stainless Steel & Champagne Gold
+      matChassisRef.current.color.setHex(0x718096);
+      matChassisRef.current.metalness = 0.82;
+      matChassisRef.current.roughness = 0.26;
 
-      matDoorRef.current.color.setHex(0xe6c667);
+      matDoorRef.current.color.setHex(0x8a9ba8);
       matDoorRef.current.metalness = 0.88;
-      matDoorRef.current.roughness = 0.18;
+      matDoorRef.current.roughness = 0.20;
 
-      matInsetRef.current.color.setHex(0xf3e2b3);
-      matInsetRef.current.metalness = 0.85;
-      matInsetRef.current.roughness = 0.20;
+      matInsetRef.current.color.setHex(0xeab308);
+      matInsetRef.current.metalness = 0.92;
+      matInsetRef.current.roughness = 0.18;
 
       matWheelRef.current.color.setHex(0xf59e0b);
       matWheelRef.current.metalness = 0.96;
       matWheelRef.current.roughness = 0.08;
 
       matChromeRef.current.color.setHex(0xffffff);
-      matChromeRef.current.metalness = 0.99;
+      matChromeRef.current.metalness = 1.0;
       matChromeRef.current.roughness = 0.03;
     } else if (targetPreset === 'mirror-chrome') {
       // 3. Aerospace Mirror Polished Chrome & Brushed Nickel (High-Tech Armored Safe)
-      matChassisRef.current.color.setHex(0xd1d5db);
+      matChassisRef.current.color.setHex(0x334155);
       matChassisRef.current.metalness = 0.95;
-      matChassisRef.current.roughness = 0.10;
-      matChassisRef.current.clearcoat = 0.9;
+      matChassisRef.current.roughness = 0.18;
 
-      matDoorRef.current.color.setHex(0xffffff);
+      matDoorRef.current.color.setHex(0x94a3b8);
       matDoorRef.current.metalness = 0.99;
-      matDoorRef.current.roughness = 0.05;
+      matDoorRef.current.roughness = 0.10;
 
-      matInsetRef.current.color.setHex(0x64748b);
-      matInsetRef.current.metalness = 0.82;
+      matInsetRef.current.color.setHex(0x475569);
+      matInsetRef.current.metalness = 0.85;
       matInsetRef.current.roughness = 0.22;
 
       matWheelRef.current.color.setHex(0xffffff);
       matWheelRef.current.metalness = 0.99;
       matWheelRef.current.roughness = 0.04;
 
-      matChromeRef.current.color.setHex(0xfbbf24);
+      matChromeRef.current.color.setHex(0xf59e0b);
       matChromeRef.current.metalness = 0.96;
       matChromeRef.current.roughness = 0.08;
     }
@@ -199,11 +196,11 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     sceneRef.current = scene;
 
     // 2. Camera: Positioned for heroic 3D safe showcase
-    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
-    camera.position.set(0, 1.4, 6.8);
-    camera.lookAt(0, -0.1, 0);
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
+    camera.position.set(0, 1.2, 7.2);
+    camera.lookAt(0, -0.05, 0);
 
-    // 3. WebGL Renderer with ACES Filmic Tone Mapping & High Specular Balance
+    // 3. WebGL Renderer with ACES Filmic Tone Mapping & Controlled 1.0 Exposure
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -214,111 +211,104 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.45;
+    renderer.toneMappingExposure = 1.05; // Balanced, prevents flat blown-out white
     rendererRef.current = renderer;
 
     // 4. Realistic Studio Environment (RoomEnvironment + PMREM)
-    // Delivers authentic studio reflections, horizon gradients, and prevents any surface from rendering black
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     const roomEnv = new RoomEnvironment();
     const envTexture = pmremGenerator.fromScene(roomEnv, 0.04).texture;
     scene.environment = envTexture;
 
-    // 5. FIVE-POINT STUDIO LIGHTING RIG (Balanced for brilliant contrast against dark background)
-    // A. Soft Base Ambient (ensures zero black shadows)
-    const ambientLight = new THREE.AmbientLight(0xe8eef5, 2.5);
+    // 5. BALANCED FIVE-POINT STUDIO LIGHTING (Rich contrast, deep metallic shadows, zero chalk)
+    // A. Soft Ambient Base Light (0.85 intensity gives natural shadows)
+    const ambientLight = new THREE.AmbientLight(0xd5e0ec, 0.85);
     scene.add(ambientLight);
 
-    // B. Main Studio Key Light (Pure White Specular on Front Door)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 5.5);
-    keyLight.position.set(4, 7, 6);
+    // B. Studio Key Light (Balanced at 2.4, reveals brushed steel grain and bevel highlights)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+    keyLight.position.set(4, 6, 5);
     scene.add(keyLight);
 
-    // C. Fill Light (Neutral White Fill on Left Chassis Wall)
-    const fillLight = new THREE.DirectionalLight(0xf0f6ff, 3.8);
-    fillLight.position.set(-6, 3, 5);
+    // C. Fill Light (Cool Steel Blue Fill at 1.2)
+    const fillLight = new THREE.DirectionalLight(0x94a3b8, 1.2);
+    fillLight.position.set(-5, 3, 4);
     scene.add(fillLight);
 
-    // D. Warm Golden Accent Light (Enriches 24K Gold Wheel Specularity)
-    const goldAccentLight = new THREE.DirectionalLight(0xffd269, 3.2);
-    goldAccentLight.position.set(2, -1, 5);
+    // D. Warm Golden Specular Light (Highlights 24K Gold Wheel at 1.5)
+    const goldAccentLight = new THREE.DirectionalLight(0xffc857, 1.5);
+    goldAccentLight.position.set(3, 0, 4);
     scene.add(goldAccentLight);
 
-    // E. Signature APEX Electric Cobalt Rim Light (Back & Chamfers)
-    const cobaltRimLight = new THREE.DirectionalLight(0x2d68ff, 4.0);
-    cobaltRimLight.position.set(0, 6, -6);
+    // E. APEX Signature Cobalt Rim Light (Back Chamfer Highlights at 1.8)
+    const cobaltRimLight = new THREE.DirectionalLight(0x2d68ff, 1.8);
+    cobaltRimLight.position.set(-1, 5, -5);
     scene.add(cobaltRimLight);
 
-    // F. Cursor-Interactive Dynamic Point Light
-    const pointLight = new THREE.PointLight(0xffffff, 4.5, 14);
+    // F. Cursor-Interactive Dynamic Specular Light
+    const pointLight = new THREE.PointLight(0xffffff, 1.5, 12);
     pointLight.position.set(0, 2, 4);
     scene.add(pointLight);
     pointLightRef.current = pointLight;
 
+    // G. Concealed Vault Interior Light (Warm Luxury Glow inside the open safe cavity)
+    const interiorLight = new THREE.PointLight(0xffbe3b, 1.8, 10);
+    interiorLight.position.set(0.2, 0.6, -0.3);
+    scene.add(interiorLight);
+
     // 6. ROOT TRANSFORMATION GROUP
     const rootGroup = new THREE.Group();
-    // ROTATION ANGLE:
-    // Model has door at negative Z (-20). We rotate root by Math.PI - 0.38
-    // so the FRONT VAULT DOOR & GOLD WHEEL face directly towards the viewer with a dynamic 3/4 angle!
-    rootGroup.rotation.x = 0.14;
-    rootGroup.rotation.y = Math.PI - 0.38;
+    // Angle (Math.PI - 0.72) showcases the open door, 24K gold combination wheel, chrome locking pins, and illuminated interior
+    rootGroup.rotation.x = 0.12;
+    rootGroup.rotation.y = Math.PI - 0.72;
     rootGroupRef.current = rootGroup;
     scene.add(rootGroup);
 
-    // 7. PBR MATERIALS FOR HIGH-CONTRAST LUXURY VAULT
-    // A. Outer Vault Chassis & Armor Shell (Box001-005, Box015)
-    const matChassis = new THREE.MeshPhysicalMaterial({
-      color: 0xe0e7ee,
-      metalness: 0.80,
-      roughness: 0.20,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.12,
-      reflectivity: 0.95,
-      wireframe: wireframeMode,
-    });
-    matChassisRef.current = matChassis;
-
-    // B. Vault Door Face Panel (Box006)
-    const matDoor = new THREE.MeshPhysicalMaterial({
-      color: 0xf4f7fa,
+    // 7. PBR MATERIALS FOR AUTHENTIC HEAVY METALLIC VAULT
+    // A. Outer Armor Chassis (Deep Gunmetal Brushed Titanium Steel - Solid, heavy, non-white)
+    const matChassis = new THREE.MeshStandardMaterial({
+      color: 0x4f5869, // Heavy gunmetal steel
       metalness: 0.85,
-      roughness: 0.16,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.08,
-      reflectivity: 0.98,
+      roughness: 0.32,
       wireframe: wireframeMode,
     });
-    matDoorRef.current = matDoor;
+    matChassisRef.current = matChassis as unknown as THREE.MeshPhysicalMaterial;
 
-    // C. Door Inset Accent Plate (Box020)
-    const matInset = new THREE.MeshPhysicalMaterial({
-      color: 0xe5b838,
-      metalness: 0.90,
-      roughness: 0.22,
-      clearcoat: 0.6,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.96,
+    // B. Vault Door Face Panel (Machined Titanium Plate)
+    const matDoor = new THREE.MeshStandardMaterial({
+      color: 0x64748b, // Brushed titanium plate
+      metalness: 0.88,
+      roughness: 0.25,
       wireframe: wireframeMode,
     });
-    matInsetRef.current = matInset;
+    matDoorRef.current = matDoor as unknown as THREE.MeshPhysicalMaterial;
 
-    // D. 5-Spoke Combination Lock Wheel & Hub (Cylinder001-006)
+    // C. Door Inset Accent Plate & Trim (Rich Brushed Imperial Gold)
+    const matInset = new THREE.MeshStandardMaterial({
+      color: 0xd4af37, // 24K Imperial Gold Plate
+      metalness: 0.92,
+      roughness: 0.20,
+      wireframe: wireframeMode,
+    });
+    matInsetRef.current = matInset as unknown as THREE.MeshPhysicalMaterial;
+
+    // D. 5-Spoke Combination Lock Wheel & Center Hub (Solid Polished 24K Pure Gold)
     const matWheel = new THREE.MeshPhysicalMaterial({
-      color: 0xfbbf24,
-      metalness: 0.96,
+      color: 0xf59e0b, // Warm radiant 24K Gold
+      metalness: 0.98,
       roughness: 0.08,
-      clearcoat: 0.9,
+      clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       reflectivity: 1.0,
       wireframe: wireframeMode,
     });
     matWheelRef.current = matWheel;
 
-    // E. Heavy Locking Bolts & Hinge Pins (Cylinder008-013)
+    // E. Heavy Locking Bolts & Hinge Pins (Mirror-Polished Hardened Chrome)
     const matChrome = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
-      metalness: 0.99,
+      metalness: 1.0,
       roughness: 0.03,
       clearcoat: 1.0,
       clearcoatRoughness: 0.02,
@@ -327,65 +317,64 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     });
     matChromeRef.current = matChrome;
 
-    // F. Heavy Hinge Blocks (Box007, Box008, Box016)
-    const matHinge = new THREE.MeshPhysicalMaterial({
-      color: 0xcbd5e1,
+    // F. Heavy Hinge Blocks (Solid Forged Steel)
+    const matHinge = new THREE.MeshStandardMaterial({
+      color: 0x334155, // Forged dark steel
       metalness: 0.85,
-      roughness: 0.25,
-      clearcoat: 0.4,
+      roughness: 0.35,
       wireframe: wireframeMode,
     });
-    matHingeRef.current = matHinge;
+    matHingeRef.current = matHinge as unknown as THREE.MeshPhysicalMaterial;
 
-    // G. Biometric Optical Tumbler Core (Cylinder007)
+    // G. Biometric Optical Tumbler Core (Electric Cobalt Laser Scanner)
     const matCore = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
+      color: 0x0a0e1a,
       emissive: 0x2d68ff,
       emissiveIntensity: 3.5,
-      metalness: 0.6,
-      roughness: 0.15,
+      metalness: 0.5,
+      roughness: 0.2,
       wireframe: wireframeMode,
     });
     matCoreRef.current = matCore;
 
-    // --- MACHINED STEEL PRESENTATION TURNTABLE (Underneath Safe) ---
+    // --- SLEEK OBSIDIAN PRECISION STAGE (Clean, grounded, no blue dinner plate!) ---
     const pedestalGroup = new THREE.Group();
-    pedestalGroup.position.y = -1.4;
+    pedestalGroup.position.y = -1.35;
     rootGroup.add(pedestalGroup);
 
-    // Heavy Circular Base Turntable
-    const pedestalGeo = new THREE.CylinderGeometry(2.7, 2.8, 0.12, 64);
+    // Dark obsidian ground plinth
+    const pedestalGeo = new THREE.CylinderGeometry(2.1, 2.2, 0.08, 64);
     const pedestalMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      metalness: 0.75,
-      roughness: 0.28,
+      color: 0x0d121c, // Dark obsidian
+      metalness: 0.5,
+      roughness: 0.6,
     });
     const pedestalMesh = new THREE.Mesh(pedestalGeo, pedestalMat);
     pedestalGroup.add(pedestalMesh);
 
-    // Concentric Inset Plate
-    const pedestalInnerGeo = new THREE.CylinderGeometry(2.4, 2.4, 0.13, 48);
+    // Milled Gunmetal Inner Plinth Ring
+    const pedestalInnerGeo = new THREE.CylinderGeometry(1.9, 1.9, 0.09, 48);
     const pedestalInnerMat = new THREE.MeshStandardMaterial({
-      color: 0x475569,
+      color: 0x1e2738,
       metalness: 0.85,
-      roughness: 0.22,
+      roughness: 0.25,
     });
     const pedestalInnerMesh = new THREE.Mesh(pedestalInnerGeo, pedestalInnerMat);
     pedestalGroup.add(pedestalInnerMesh);
 
-    // Glowing APEX Electric Cobalt Halo Rim
-    const pedestalRimGeo = new THREE.TorusGeometry(2.72, 0.028, 16, 64);
+    // Subtle Electric Cobalt Hairline Ring
+    const pedestalRimGeo = new THREE.TorusGeometry(2.12, 0.015, 16, 64);
     const pedestalRimMat = new THREE.MeshStandardMaterial({
       color: 0x2d68ff,
       emissive: 0x2d68ff,
-      emissiveIntensity: 4.0,
+      emissiveIntensity: 2.5,
     });
     const pedestalRim = new THREE.Mesh(pedestalRimGeo, pedestalRimMat);
     pedestalRim.rotation.x = Math.PI / 2;
-    pedestalRim.position.y = 0.06;
+    pedestalRim.position.y = 0.045;
     pedestalGroup.add(pedestalRim);
 
-    // 8. LOAD AND PRECISELY MAP safe_vault.glb MESHES
+    // 8. LOAD AND PRECISELY MAP safe_vault.glb (Preserving embedded brushed metal UV maps!)
     const loader = new GLTFLoader();
     loader.load(
       '/safe_vault.glb',
@@ -402,8 +391,10 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
             mesh.receiveShadow = true;
 
             const name = mesh.name.toLowerCase();
+            const origMat = mesh.material as THREE.MeshStandardMaterial;
+            const originalTexture = origMat?.map || null;
 
-            // 1. Wheel Spokes & Center Hub (Cylinder001 - Cylinder006) -> 24K Gold
+            // 1. Wheel Spokes & Center Hub (Cylinder001 - Cylinder006) -> 24K Pure Gold
             if (
               name.includes('cylinder001') ||
               name.includes('cylinder002') ||
@@ -435,13 +426,17 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
             ) {
               mesh.material = matChrome;
             }
-            // 4. Vault Door Outer Front Face (Box006) -> Aerospace Titanium-Silver
+            // 4. Vault Door Outer Front Face (Box006) -> Titanium with brushed texture
             else if (name.includes('box006')) {
-              mesh.material = matDoor;
+              const doorMat = matDoor.clone();
+              if (originalTexture) doorMat.map = originalTexture;
+              mesh.material = doorMat;
             }
-            // 5. Vault Door Inset / Reinforcement Plate (Box020) -> 24K Imperial Gold
+            // 5. Vault Door Inset / Reinforcement Plate (Box020) -> 24K Imperial Gold Plate
             else if (name.includes('box020')) {
-              mesh.material = matInset;
+              const insetMat = matInset.clone();
+              if (originalTexture) insetMat.map = originalTexture;
+              mesh.material = insetMat;
             }
             // 6. Heavy Hinge Blocks (Box007, Box008, Box016) -> Forged Steel
             else if (
@@ -463,11 +458,15 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
               name.includes('box018') ||
               name.includes('box019')
             ) {
-              mesh.material = matInset;
+              const fastenerMat = matInset.clone();
+              if (originalTexture) fastenerMat.map = originalTexture;
+              mesh.material = fastenerMat;
             }
-            // 8. Outer Armor Chassis & Walls (Box001-Box005, Box015) -> Brushed Platinum Steel
+            // 8. Outer Armor Chassis & Walls (Box001-Box005, Box015) -> Brushed Gunmetal Titanium Steel
             else {
-              mesh.material = matChassis;
+              const chassisMat = matChassis.clone();
+              if (originalTexture) chassisMat.map = originalTexture;
+              mesh.material = chassisMat;
             }
           }
         });
