@@ -2,36 +2,25 @@
 
 /**
  * @file Hero3DVisual.tsx
- * @description Ultra-Vibrant Interactive 3D APEX VIP Onboarding Vault for Hero Section
+ * @description Authentic 3D APEX Safe Vault (safe_vault.glb) with PBR Metallic Theming
  * 
  * KIYA HORAHA HAI:
- * - Pehle jo dark/black silhouette lag raha tha, usko completely transform kar diya hai:
- *   1. TWO-TONE VIBRANT FINISH:
- *      - Base Chassis: Luminous Electric Cobalt Blue (#2465FF) with high metallic sheen.
- *      - Upper Lid: Gleaming Brushed Platinum-Silver (#D8E4FC) with icy specular reflections.
- *      - Corners: Mirror Polished Chrome (#EEF5FF).
- *      - Emblem: 24K Polished Imperial Gold (#FFD700) badge with cobalt neon chevron.
- *   2. NEON LIGHTING & GLOWING ACCENTS:
- *      - Glowing Cyan-Cobalt LED Laser Seam (#00F0FF, emissive intensity 4.5).
- *      - Biometric Scanner Pad (#00FFFF) with glowing fingerprint sensor.
- *   3. HOLOGRAPHIC STAGE PEDESTAL:
- *      - Vault ke neeche rotating concentric neon light rings (#2D68FF & #00F0FF)
- *        jo upward colored bounce light cast karti hain.
- *   4. MULTI-COLOR STUDIO LIGHTING RIG:
- *      - Ambient Light (4.0 intensity) + Pure White Key Light (5.5) +
- *        Cobalt Side Light (6.0) + Cyan Rim Light (4.5) + Blue Stage Uplight (4.5).
- *      - Koi bhi face kabhi bhi black nahi hogi!
- *   5. COLORWAY THEME SWITCHER:
- *      - User 1-click se 'Cobalt' (Blue/Silver), 'Gold' (24K Gold/Amber), ya 'Cyber' (Violet/Cyan)
- *        presets switch kar sakta hai!
- *   6. INTERACTIVE PNEUMATIC DAMPER:
- *      - Click karne par lid piche smoothly lift hoti hai, revealing Royal Sapphire velvet
- *        nest aur 24K Gold APEX Recovery Key!
+ * - Public folder mein mojud user ke 3D model 'safe_vault.glb' ko load karta hai via Three.js GLTFLoader.
+ * - Model ko auto-center aur auto-scale karta hai taake camera viewport mein perfectly fit ho.
+ * - REALISTIC APEX LUXURY THEME:
+ *   1. Outer Chassis: Deep Anodized Titanium Gunmetal with blue pearlescence.
+ *   2. Vault Door Panel: Saturated APEX Electric Cobalt Blue (#2264FF).
+ *   3. Combination Lock Wheel: 24K Polished Imperial Gold (#FFD700) with specular glint.
+ *   4. Heavy Locking Bolts & Hinges: Mirror-polished Chrome Platinum Steel (#EEF4FF).
+ *   5. Biometric Center Hub: Luminous Cyan Laser Core (#00F0FF, emissive intensity 3.8).
+ * - Interactive Dial Spin: User click kare ya lock dial rotate ho with realistic inertia.
+ * - Drag-to-Rotate, Studio Multi-point Lighting, Holographic Pedestal, Colorway Theme Switcher.
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { Rotate3d, Box, Lock, Unlock, Palette, Sparkles } from 'lucide-react';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Rotate3d, Box, Lock, Unlock, Palette, Sparkles, RefreshCw } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 type Colorway = 'cobalt' | 'gold' | 'cyber';
@@ -51,7 +40,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   const [colorway, setColorway] = useState<Colorway>('cobalt');
   const [isLoading, setIsLoading] = useState(true);
   const [wireframeMode, setWireframeMode] = useState(false);
-  const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const [isDialSpinning, setIsDialSpinning] = useState(false);
   const prefersReduced = usePrefersReducedMotion();
 
   // Animation & Three.js references
@@ -61,55 +50,44 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const rootGroupRef = useRef<THREE.Group | null>(null);
-  const lidHingeGroupRef = useRef<THREE.Group | null>(null);
+  const vaultModelRef = useRef<THREE.Group | null>(null);
+  const wheelNodesRef = useRef<THREE.Object3D[]>([]);
   const stageRing1Ref = useRef<THREE.Mesh | null>(null);
   const stageRing2Ref = useRef<THREE.Mesh | null>(null);
   const pointLightRef = useRef<THREE.PointLight | null>(null);
   const materialsMapRef = useRef<{
-    baseMat?: THREE.MeshPhysicalMaterial;
-    lidMat?: THREE.MeshPhysicalMaterial;
-    cornerMat?: THREE.MeshStandardMaterial;
-    seamMat?: THREE.MeshStandardMaterial;
-    scannerMat?: THREE.MeshStandardMaterial;
-    emblemMat?: THREE.MeshStandardMaterial;
-    velvetMat?: THREE.MeshStandardMaterial;
-    keyMat?: THREE.MeshStandardMaterial;
+    chassisMat?: THREE.MeshPhysicalMaterial;
+    doorMat?: THREE.MeshPhysicalMaterial;
+    wheelMat?: THREE.MeshStandardMaterial;
+    boltsMat?: THREE.MeshStandardMaterial;
+    coreMat?: THREE.MeshStandardMaterial;
     stage1Mat?: THREE.MeshStandardMaterial;
     stage2Mat?: THREE.MeshStandardMaterial;
   }>({});
-  const isVaultOpenRef = useRef<boolean>(false);
 
-  // Sync ref with state
-  useEffect(() => {
-    isVaultOpenRef.current = isVaultOpen;
-  }, [isVaultOpen]);
+  // Trigger combination wheel spin animation
+  const handleSpinDial = () => {
+    setIsDialSpinning(true);
+    setTimeout(() => setIsDialSpinning(false), 2400);
+  };
 
   // Update materials when colorway changes
   useEffect(() => {
     const mats = materialsMapRef.current;
-    if (!mats.baseMat || !mats.lidMat) return;
+    if (!mats.chassisMat || !mats.doorMat) return;
 
     if (colorway === 'cobalt') {
-      // Cobalt Signature: Electric Cobalt + Platinum Silver + Cyan Neon + Gold Emblem
-      mats.baseMat.color.setHex(0x2062ff);
-      mats.lidMat.color.setHex(0xd0e0fb);
-      if (mats.cornerMat) mats.cornerMat.color.setHex(0xeef4ff);
-      if (mats.seamMat) {
-        mats.seamMat.color.setHex(0x00f0ff);
-        mats.seamMat.emissive.setHex(0x00f0ff);
+      // Cobalt Signature: Gunmetal Chassis + Electric Cobalt Door + 24K Gold Wheel + Cyan Laser
+      mats.chassisMat.color.setHex(0x1a2336);
+      mats.doorMat.color.setHex(0x2264ff);
+      if (mats.wheelMat) {
+        mats.wheelMat.color.setHex(0xffd700);
+        mats.wheelMat.emissive.setHex(0x4a3600);
       }
-      if (mats.scannerMat) {
-        mats.scannerMat.color.setHex(0x00ffff);
-        mats.scannerMat.emissive.setHex(0x00ffff);
-      }
-      if (mats.emblemMat) {
-        mats.emblemMat.color.setHex(0xffd700);
-        mats.emblemMat.emissive.setHex(0xb8860b);
-      }
-      if (mats.velvetMat) mats.velvetMat.color.setHex(0x12244e);
-      if (mats.keyMat) {
-        mats.keyMat.color.setHex(0xffc700);
-        mats.keyMat.emissive.setHex(0x1f47bf);
+      if (mats.boltsMat) mats.boltsMat.color.setHex(0xeef4ff);
+      if (mats.coreMat) {
+        mats.coreMat.color.setHex(0x00f0ff);
+        mats.coreMat.emissive.setHex(0x00f0ff);
       }
       if (mats.stage1Mat) {
         mats.stage1Mat.color.setHex(0x2d68ff);
@@ -120,26 +98,17 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         mats.stage2Mat.emissive.setHex(0x00f0ff);
       }
     } else if (colorway === 'gold') {
-      // Gold Luxury: Imperial 24K Gold + Midnight Obsidian + Signal Amber Neon
-      mats.baseMat.color.setHex(0x181e2e);
-      mats.lidMat.color.setHex(0xefb810);
-      if (mats.cornerMat) mats.cornerMat.color.setHex(0xffd700);
-      if (mats.seamMat) {
-        mats.seamMat.color.setHex(0xff9500);
-        mats.seamMat.emissive.setHex(0xff9500);
+      // Gold Luxury: Obsidian Chassis + 24K Imperial Gold Door + Platinum Wheel + Amber Laser
+      mats.chassisMat.color.setHex(0x0f1420);
+      mats.doorMat.color.setHex(0xefb810);
+      if (mats.wheelMat) {
+        mats.wheelMat.color.setHex(0xffffff);
+        mats.wheelMat.emissive.setHex(0x555555);
       }
-      if (mats.scannerMat) {
-        mats.scannerMat.color.setHex(0xffb800);
-        mats.scannerMat.emissive.setHex(0xffb800);
-      }
-      if (mats.emblemMat) {
-        mats.emblemMat.color.setHex(0xffffff);
-        mats.emblemMat.emissive.setHex(0x888888);
-      }
-      if (mats.velvetMat) mats.velvetMat.color.setHex(0x2e0c15);
-      if (mats.keyMat) {
-        mats.keyMat.color.setHex(0xffffff);
-        mats.keyMat.emissive.setHex(0xff9500);
+      if (mats.boltsMat) mats.boltsMat.color.setHex(0xffd700);
+      if (mats.coreMat) {
+        mats.coreMat.color.setHex(0xff9500);
+        mats.coreMat.emissive.setHex(0xff9500);
       }
       if (mats.stage1Mat) {
         mats.stage1Mat.color.setHex(0xff9500);
@@ -150,26 +119,17 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         mats.stage2Mat.emissive.setHex(0xffd700);
       }
     } else if (colorway === 'cyber') {
-      // Cyber Neo: Cyber Violet + Electric Cyan + Neon Pink/Magenta
-      mats.baseMat.color.setHex(0x791ae5);
-      mats.lidMat.color.setHex(0x00e5ff);
-      if (mats.cornerMat) mats.cornerMat.color.setHex(0xff007f);
-      if (mats.seamMat) {
-        mats.seamMat.color.setHex(0xff007f);
-        mats.seamMat.emissive.setHex(0xff007f);
+      // Cyber Neo: Cyber Indigo Chassis + Neon Violet Door + Electric Cyan Wheel + Hot Pink Laser
+      mats.chassisMat.color.setHex(0x190833);
+      mats.doorMat.color.setHex(0x791ae5);
+      if (mats.wheelMat) {
+        mats.wheelMat.color.setHex(0x00f0ff);
+        mats.wheelMat.emissive.setHex(0x006688);
       }
-      if (mats.scannerMat) {
-        mats.scannerMat.color.setHex(0x00f0ff);
-        mats.scannerMat.emissive.setHex(0x00f0ff);
-      }
-      if (mats.emblemMat) {
-        mats.emblemMat.color.setHex(0xffd700);
-        mats.emblemMat.emissive.setHex(0xff007f);
-      }
-      if (mats.velvetMat) mats.velvetMat.color.setHex(0x20003c);
-      if (mats.keyMat) {
-        mats.keyMat.color.setHex(0x00f0ff);
-        mats.keyMat.emissive.setHex(0xff007f);
+      if (mats.boltsMat) mats.boltsMat.color.setHex(0xff007f);
+      if (mats.coreMat) {
+        mats.coreMat.color.setHex(0x00ffff);
+        mats.coreMat.emissive.setHex(0x00ffff);
       }
       if (mats.stage1Mat) {
         mats.stage1Mat.color.setHex(0xff007f);
@@ -195,7 +155,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     });
   }, []);
 
-  // Initialize Three.js Scene
+  // Initialize Three.js Scene & Load safe_vault.glb
   useEffect(() => {
     if (mode !== 'three' || prefersReduced) {
       setIsLoading(false);
@@ -209,16 +169,16 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     let width = container.clientWidth || 500;
     let height = container.clientHeight || 450;
 
-    // 1. Scene setup
+    // 1. Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // 2. Camera: Positioned with clear 3/4 perspective
+    // 2. Camera
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 2.3, 6.2);
+    camera.position.set(0, 1.8, 6.4);
     camera.lookAt(0, 0, 0);
 
-    // 3. Renderer with Mobile Optimization
+    // 3. Renderer
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -232,50 +192,61 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     renderer.toneMappingExposure = 1.45;
     rendererRef.current = renderer;
 
-    // 4. STUDIO LIGHTING RIG — MULTI-COLORED, VIBRANT, ZERO BLACK BLOTS!
-    // A. Luminous Ambient Light so every shadow retains rich cobalt tone
-    const ambientLight = new THREE.AmbientLight(0x384d75, 4.0);
+    // 4. STUDIO LIGHTING RIG — MULTI-COLORED, VIBRANT PBR
+    // Luminous Ambient Light so NO face is ever dark
+    const ambientLight = new THREE.AmbientLight(0x3a4f78, 4.2);
     scene.add(ambientLight);
 
-    // B. Studio Key Light (Pure White Top-Front Specular)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 5.5);
+    // Studio Key Light (Pure White Top-Right Specular)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 5.8);
     keyLight.position.set(6, 8, 6);
     scene.add(keyLight);
 
-    // C. Saturated Electric Cobalt Side Light
-    const cobaltLight = new THREE.DirectionalLight(0x2d68ff, 6.5);
-    cobaltLight.position.set(-6, 5, 4);
+    // Saturated Electric Cobalt Light (Left Front)
+    const cobaltLight = new THREE.DirectionalLight(0x2d68ff, 6.8);
+    cobaltLight.position.set(-6, 4, 4);
     scene.add(cobaltLight);
 
-    // D. Saturated Cyan Rim Light (from behind-right)
-    const rimLight = new THREE.DirectionalLight(0x00e5ff, 4.5);
+    // Cyan Rim Light (Back Side)
+    const rimLight = new THREE.DirectionalLight(0x00e5ff, 4.8);
     rimLight.position.set(4, 5, -5);
     scene.add(rimLight);
 
-    // E. Upward Stage Glow Light (illuminating the base from underneath)
-    const upLight = new THREE.DirectionalLight(0x3872ff, 4.5);
+    // Upward Stage Light (From underneath)
+    const upLight = new THREE.DirectionalLight(0x3872ff, 4.8);
     upLight.position.set(0, -6, 2);
     scene.add(upLight);
 
-    // F. Mouse-interactive dynamic point light
+    // Mouse-interactive dynamic point light
     const pointLight = new THREE.PointLight(0x60a5fa, 8, 14);
     pointLight.position.set(0, 2, 4);
     scene.add(pointLight);
     pointLightRef.current = pointLight;
 
-    // 5. 3D Model: APEX VIP Onboarding Vault Chest
+    // 5. Root Group
     const rootGroup = new THREE.Group();
     // Default initial rotation showing front-three-quarter view
-    rootGroup.rotation.x = 0.28;
-    rootGroup.rotation.y = -0.45;
+    rootGroup.rotation.x = 0.22;
+    rootGroup.rotation.y = -0.42;
     rootGroupRef.current = rootGroup;
     scene.add(rootGroup);
 
-    // --- MATERIALS WITH VIBRANT SATURATED BASE COLORS ---
-    // A. Base Chassis: Saturated Luminous Electric Cobalt Blue
-    const baseMat = new THREE.MeshPhysicalMaterial({
-      color: 0x2062ff,
-      metalness: 0.45, // Lower metalness prevents dark reflections, gives vibrant body color!
+    // --- REALISTIC APEX PBR MATERIALS ---
+    // A. Outer Chassis: Deep Anodized Titanium Gunmetal
+    const chassisMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1a2336,
+      metalness: 0.72,
+      roughness: 0.22,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.15,
+      reflectivity: 0.9,
+      wireframe: wireframeMode,
+    });
+
+    // B. Vault Door Panel: Saturated APEX Electric Cobalt Blue
+    const doorMat = new THREE.MeshPhysicalMaterial({
+      color: 0x2264ff,
+      metalness: 0.52,
       roughness: 0.18,
       clearcoat: 0.95,
       clearcoatRoughness: 0.1,
@@ -283,73 +254,35 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       wireframe: wireframeMode,
     });
 
-    // B. Upper Lid: Gleaming Brushed Platinum-Silver with Icy Specular
-    const lidMat = new THREE.MeshPhysicalMaterial({
-      color: 0xd0e0fb,
-      metalness: 0.6,
-      roughness: 0.15,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.95,
+    // C. Combination Lock Wheel: 24K Polished Imperial Gold
+    const wheelMat = new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      metalness: 0.92,
+      roughness: 0.14,
+      emissive: 0x4a3600,
+      emissiveIntensity: 0.2,
       wireframe: wireframeMode,
     });
 
-    // C. Mirror Polished Chrome Corner Pillars
-    const cornerMat = new THREE.MeshStandardMaterial({
+    // D. Heavy Locking Bolts & Hinge Pins: Mirror Chrome Steel
+    const boltsMat = new THREE.MeshStandardMaterial({
       color: 0xeef4ff,
-      metalness: 0.85,
+      metalness: 0.96,
       roughness: 0.08,
       wireframe: wireframeMode,
     });
 
-    // D. Glowing Cyan-Cobalt LED Laser Seam
-    const seamMat = new THREE.MeshStandardMaterial({
+    // E. Biometric Center Hub: Luminous Cyan Laser Core
+    const coreMat = new THREE.MeshStandardMaterial({
       color: 0x00f0ff,
       emissive: 0x00f0ff,
-      emissiveIntensity: 4.5,
-      roughness: 0.05,
-      metalness: 0.2,
-      wireframe: wireframeMode,
-    });
-
-    // E. Biometric Cyan Scanner Glass
-    const scannerMat = new THREE.MeshStandardMaterial({
-      color: 0x00ffff,
-      emissive: 0x00ffff,
-      emissiveIntensity: 4.0,
+      emissiveIntensity: 3.8,
       roughness: 0.05,
       metalness: 0.3,
       wireframe: wireframeMode,
     });
 
-    // F. Top APEX Emblem: 24K Polished Gold Badge
-    const emblemMat = new THREE.MeshStandardMaterial({
-      color: 0xffd700,
-      emissive: 0xb8860b,
-      emissiveIntensity: 0.3,
-      metalness: 0.95,
-      roughness: 0.12,
-      wireframe: wireframeMode,
-    });
-
-    // G. Velvet Interior Foam Nest (Royal Sapphire Blue)
-    const velvetMat = new THREE.MeshStandardMaterial({
-      color: 0x12244e,
-      roughness: 0.95,
-      metalness: 0.05,
-      wireframe: wireframeMode,
-    });
-
-    // H. Inside Vault: 24K Gold Bar APEX Encrypted Key
-    const keyMat = new THREE.MeshStandardMaterial({
-      color: 0xffc700,
-      emissive: 0x1f47bf,
-      emissiveIntensity: 0.6,
-      metalness: 0.95,
-      roughness: 0.15,
-    });
-
-    // I. Stage Pedestal Rings
+    // F. Holographic Stage Pedestal Rings
     const stage1Mat = new THREE.MeshStandardMaterial({
       color: 0x2d68ff,
       emissive: 0x2d68ff,
@@ -362,159 +295,33 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     });
 
     materialsMapRef.current = {
-      baseMat,
-      lidMat,
-      cornerMat,
-      seamMat,
-      scannerMat,
-      emblemMat,
-      velvetMat,
-      keyMat,
+      chassisMat,
+      doorMat,
+      wheelMat,
+      boltsMat,
+      coreMat,
       stage1Mat,
       stage2Mat,
     };
 
-    // --- VAULT BASE (LOWER CHASSIS) ---
-    const baseGroup = new THREE.Group();
-    rootGroup.add(baseGroup);
-
-    // Main base box
-    const baseGeo = new THREE.BoxGeometry(3.2, 0.9, 2.2);
-    const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-    baseMesh.position.y = -0.45;
-    baseGroup.add(baseMesh);
-
-    // Interior Velvet Nest (recessed inside base)
-    const interiorGeo = new THREE.BoxGeometry(2.9, 0.2, 1.9);
-    const interiorMesh = new THREE.Mesh(interiorGeo, velvetMat);
-    interiorMesh.position.y = 0.01;
-    baseGroup.add(interiorMesh);
-
-    // Encrypted APEX Recovery Key (Gold VIP Artifact)
-    const keyGeo = new THREE.BoxGeometry(0.85, 0.08, 0.35);
-    const keyMesh = new THREE.Mesh(keyGeo, keyMat);
-    keyMesh.position.set(0, 0.06, 0);
-    keyMesh.rotation.y = 0.25;
-    baseGroup.add(keyMesh);
-
-    // Base Chamfered Armor Corner Pillars (4 corners)
-    const cornerPositions = [
-      [-1.61, -0.45, -1.11],
-      [1.61, -0.45, -1.11],
-      [-1.61, -0.45, 1.11],
-      [1.61, -0.45, 1.11],
-    ];
-    cornerPositions.forEach(([cx, cy, cz]) => {
-      const cornerGeo = new THREE.BoxGeometry(0.2, 0.92, 0.2);
-      const cornerMesh = new THREE.Mesh(cornerGeo, cornerMat);
-      cornerMesh.position.set(cx, cy, cz);
-      baseGroup.add(cornerMesh);
-    });
-
-    // Glowing Cobalt-Cyan Perimeter Seam (Base Top Rim)
-    const seamGeo = new THREE.BoxGeometry(3.24, 0.045, 2.24);
-    const seamMesh = new THREE.Mesh(seamGeo, seamMat);
-    seamMesh.position.y = 0.01;
-    baseGroup.add(seamMesh);
-
-    // Front Biometric Roller Lock Housing on Base
-    const lockHousingGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.08, 32);
-    const lockHousing = new THREE.Mesh(lockHousingGeo, cornerMat);
-    lockHousing.rotation.x = Math.PI / 2;
-    lockHousing.position.set(0, -0.25, 1.12);
-    baseGroup.add(lockHousing);
-
-    // Biometric Scanner Glowing Ring
-    const scannerRingGeo = new THREE.TorusGeometry(0.2, 0.03, 16, 32);
-    const scannerRing = new THREE.Mesh(scannerRingGeo, scannerMat);
-    scannerRing.position.set(0, -0.25, 1.16);
-    baseGroup.add(scannerRing);
-
-    // Biometric Center Sensor
-    const sensorGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.02, 32);
-    const sensorMesh = new THREE.Mesh(sensorGeo, seamMat);
-    sensorMesh.rotation.x = Math.PI / 2;
-    sensorMesh.position.set(0, -0.25, 1.16);
-    baseGroup.add(sensorMesh);
-
-    // Rear Chrome Hinges
-    const hinge1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), cornerMat);
-    hinge1.rotation.z = Math.PI / 2;
-    hinge1.position.set(-0.9, 0.02, -1.12);
-    baseGroup.add(hinge1);
-
-    const hinge2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 16), cornerMat);
-    hinge2.rotation.z = Math.PI / 2;
-    hinge2.position.set(0.9, 0.02, -1.12);
-    baseGroup.add(hinge2);
-
-    // --- VAULT LID (UPPER PNEUMATIC CHASSIS) ---
-    const lidHingeGroup = new THREE.Group();
-    lidHingeGroup.position.set(0, 0.02, -1.1);
-    lidHingeGroupRef.current = lidHingeGroup;
-    rootGroup.add(lidHingeGroup);
-
-    const lidContent = new THREE.Group();
-    lidContent.position.set(0, 0, 1.1);
-    lidHingeGroup.add(lidContent);
-
-    // Lid Main Box (Brushed Platinum-Silver)
-    const lidGeo = new THREE.BoxGeometry(3.2, 0.65, 2.2);
-    const lidMesh = new THREE.Mesh(lidGeo, lidMat);
-    lidMesh.position.y = 0.325;
-    lidContent.add(lidMesh);
-
-    // Lid Armor Corner Pillars
-    cornerPositions.forEach(([cx, _, cz]) => {
-      const lidCornerGeo = new THREE.BoxGeometry(0.2, 0.66, 0.2);
-      const lidCornerMesh = new THREE.Mesh(lidCornerGeo, cornerMat);
-      lidCornerMesh.position.set(cx, 0.325, cz);
-      lidContent.add(lidCornerMesh);
-    });
-
-    // Top APEX Monogram Inlay Plate (Gold Badge)
-    const emblemPlateGeo = new THREE.BoxGeometry(1.6, 0.035, 1.1);
-    const emblemPlate = new THREE.Mesh(emblemPlateGeo, emblemMat);
-    emblemPlate.position.set(0, 0.66, 0);
-    lidContent.add(emblemPlate);
-
-    // Laser-Etched Glowing APEX Geometric Monogram
-    const logoSymbolGeo = new THREE.TorusGeometry(0.3, 0.035, 16, 3);
-    const logoSymbol = new THREE.Mesh(logoSymbolGeo, seamMat);
-    logoSymbol.rotation.x = Math.PI / 2;
-    logoSymbol.rotation.z = Math.PI;
-    logoSymbol.position.set(0, 0.685, 0);
-    lidContent.add(logoSymbol);
-
-    // Top Chamfer Accent Lines (Electric Cyan Neon)
-    const accentLine1 = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.025, 0.035), seamMat);
-    accentLine1.position.set(0, 0.66, -0.68);
-    lidContent.add(accentLine1);
-
-    const accentLine2 = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.025, 0.035), seamMat);
-    accentLine2.position.set(0, 0.66, 0.68);
-    lidContent.add(accentLine2);
-
-    // --- HOLOGRAPHIC PROJECTION STAGE PEDESTAL BENEATH VAULT ---
+    // --- HOLOGRAPHIC PROJECTION STAGE PEDESTAL ---
     const stageGroup = new THREE.Group();
-    stageGroup.position.y = -1.15;
+    stageGroup.position.y = -1.25;
     rootGroup.add(stageGroup);
 
-    // Outer Neon Projection Ring
-    const stageRing1Geo = new THREE.TorusGeometry(2.35, 0.03, 16, 64);
+    const stageRing1Geo = new THREE.TorusGeometry(2.45, 0.03, 16, 64);
     const stageRing1 = new THREE.Mesh(stageRing1Geo, stage1Mat);
     stageRing1.rotation.x = Math.PI / 2;
     stageGroup.add(stageRing1);
     stageRing1Ref.current = stageRing1;
 
-    // Inner Neon Projection Ring
-    const stageRing2Geo = new THREE.TorusGeometry(1.65, 0.025, 16, 64);
+    const stageRing2Geo = new THREE.TorusGeometry(1.75, 0.025, 16, 64);
     const stageRing2 = new THREE.Mesh(stageRing2Geo, stage2Mat);
     stageRing2.rotation.x = Math.PI / 2;
     stageGroup.add(stageRing2);
     stageRing2Ref.current = stageRing2;
 
-    // Subtle Ambient Floating Dust Particles around Vault
+    // Ambient floating particles
     const particleCount = isMobile ? 35 : 70;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
@@ -533,9 +340,108 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     const dustParticles = new THREE.Points(particleGeo, particleMat);
     rootGroup.add(dustParticles);
 
-    setIsLoading(false);
+    // 6. LOAD safe_vault.glb AND ASSIGN MATERIALS
+    const loader = new GLTFLoader();
+    loader.load(
+      '/safe_vault.glb',
+      (gltf) => {
+        const vaultGroup = new THREE.Group();
+        vaultModelRef.current = vaultGroup;
 
-    // 6. Intersection Observer for Mobile CPU/Battery Conservation
+        // Traverse and apply thematic realistic PBR materials
+        wheelNodesRef.current = [];
+        gltf.scene.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            const name = mesh.name.toLowerCase();
+            const origMatName = (mesh.material as THREE.Material)?.name || '';
+
+            // Wheel / Dial Spokes & Turning Knob
+            if (
+              name.includes('cylinder001') ||
+              name.includes('cylinder002') ||
+              name.includes('cylinder003') ||
+              name.includes('cylinder004') ||
+              name.includes('cylinder005') ||
+              origMatName.includes('20')
+            ) {
+              mesh.material = wheelMat;
+              wheelNodesRef.current.push(mesh);
+            }
+            // Biometric Center Hub / Tumbler Indicator
+            else if (
+              name.includes('cylinder007') ||
+              origMatName.includes('38') ||
+              origMatName.includes('37')
+            ) {
+              mesh.material = coreMat;
+              wheelNodesRef.current.push(mesh);
+            }
+            // Locking Bolts & Hinge Pins
+            else if (
+              name.includes('cylinder006') ||
+              name.includes('cylinder008') ||
+              name.includes('cylinder009') ||
+              name.includes('cylinder010') ||
+              name.includes('cylinder011') ||
+              name.includes('cylinder012') ||
+              name.includes('cylinder013')
+            ) {
+              mesh.material = boltsMat;
+            }
+            // Door Face Plate & Reinforced Insets
+            else if (
+              name.includes('box009') ||
+              name.includes('box010') ||
+              name.includes('box011') ||
+              name.includes('box012') ||
+              name.includes('box013') ||
+              name.includes('box014') ||
+              name.includes('box017') ||
+              name.includes('box018') ||
+              name.includes('box019') ||
+              name.includes('box020') ||
+              origMatName.includes('03')
+            ) {
+              mesh.material = doorMat;
+            }
+            // Outer Heavy Armor Chassis & Frame
+            else {
+              mesh.material = chassisMat;
+            }
+          }
+        });
+
+        // Compute Bounding Box, perfectly center, and auto-scale
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        // Center the geometry
+        gltf.scene.position.x = -center.x;
+        gltf.scene.position.y = -center.y;
+        gltf.scene.position.z = -center.z;
+
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scaleFactor = 3.5 / (maxDim || 1);
+        vaultGroup.scale.setScalar(scaleFactor);
+
+        vaultGroup.add(gltf.scene);
+        rootGroup.add(vaultGroup);
+
+        setIsLoading(false);
+      },
+      undefined,
+      (err) => {
+        console.error('Failed to load /safe_vault.glb', err);
+        setIsLoading(false);
+      }
+    );
+
+    // 7. Intersection Observer for Mobile Battery Conservation
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -546,7 +452,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     );
     observer.observe(container);
 
-    // 7. Mouse & Touch Interaction
+    // 8. Mouse & Touch Interaction
     const handlePointerDown = (e: MouseEvent | TouchEvent) => {
       mouseRef.current.isDown = true;
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -588,7 +494,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     window.addEventListener('touchmove', handlePointerMove, { passive: true });
     window.addEventListener('touchend', handlePointerUp);
 
-    // 8. Resize Handler
+    // 9. Resize Handler
     const handleResize = () => {
       if (!container || !renderer) return;
       width = container.clientWidth;
@@ -599,7 +505,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // 9. Animation Render Loop
+    // 10. Animation Render Loop
     let clock = new THREE.Clock();
 
     const animate = () => {
@@ -609,34 +515,35 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
 
       const elapsed = clock.getElapsedTime();
 
-      // Smooth mouse interpolation (Damping)
+      // Smooth mouse interpolation
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.06;
       mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.06;
 
-      // Update interactive point light position based on cursor
+      // Update point light position
       if (pointLightRef.current) {
         pointLightRef.current.position.x = mouseRef.current.x * 4;
         pointLightRef.current.position.y = mouseRef.current.y * 3 + 2;
       }
 
-      // Smooth subtle floating bobbing motion (when not actively dragging)
+      // Smooth idle floating bobbing & turntable rotation
       if (!mouseRef.current.isDown && rootGroup) {
-        rootGroup.position.y = Math.sin(elapsed * 1.4) * 0.08;
-        // Slow idle turntable rotation
+        rootGroup.position.y = Math.sin(elapsed * 1.3) * 0.07;
         rootGroup.rotation.y += 0.0025;
       }
 
-      // Pneumatic Damper Lid Open / Close interpolation
-      if (lidHingeGroupRef.current) {
-        const targetAngle = isVaultOpenRef.current ? -Math.PI * 0.45 : 0;
-        lidHingeGroupRef.current.rotation.x += (targetAngle - lidHingeGroupRef.current.rotation.x) * 0.08;
+      // Interactive combination wheel spin
+      if (wheelNodesRef.current.length > 0) {
+        const spinSpeed = isDialSpinning ? 0.08 : 0.003;
+        wheelNodesRef.current.forEach((node) => {
+          node.rotation.z += spinSpeed;
+        });
       }
 
       // Rotating concentric holographic stage rings
       if (stageRing1Ref.current) stageRing1Ref.current.rotation.z = elapsed * 0.3;
       if (stageRing2Ref.current) stageRing2Ref.current.rotation.z = -elapsed * 0.45;
 
-      // Floating dust particles drift
+      // Dust particles drift
       dustParticles.rotation.y = elapsed * 0.05;
 
       renderer.render(scene, camera);
@@ -657,10 +564,8 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       window.removeEventListener('touchend', handlePointerUp);
 
       renderer.dispose();
-      baseGeo.dispose();
-      interiorGeo.dispose();
-      keyGeo.dispose();
-      lidGeo.dispose();
+      stageRing1Geo.dispose();
+      stageRing2Geo.dispose();
       particleGeo.dispose();
       Object.values(materialsMapRef.current).forEach((m) => m?.dispose());
     };
@@ -681,7 +586,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#070A14]/90 backdrop-blur-md border border-[#2D68FF]/40 shadow-[0_0_15px_rgba(45,104,255,0.3)]">
           <span className="w-2.5 h-2.5 rounded-full bg-[#00F0FF] animate-pulse shadow-[0_0_8px_#00F0FF]" />
           <span className="text-[11px] font-mono text-[#F8F9FD] tracking-wider uppercase font-semibold">
-            {mode === 'three' ? 'APEX VIP Vault (3D Milled Spec)' : 'Spline 3D Scene'}
+            {mode === 'three' ? 'APEX Executive Vault (safe_vault.glb)' : 'Spline 3D Scene'}
           </span>
         </div>
 
@@ -689,7 +594,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#070A14]/90 backdrop-blur-md border border-white/15 shadow-xl">
           {mode === 'three' && (
             <>
-              {/* Colorway Switcher Buttons */}
+              {/* Colorway Switcher */}
               <div className="flex items-center gap-1 pr-1 mr-1 border-r border-white/10">
                 <button
                   onClick={() => setColorway('cobalt')}
@@ -731,41 +636,32 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
                 </button>
               </div>
 
-              {/* Open / Close Vault Toggle */}
+              {/* Spin Dial / Unlock Wheel Action */}
               <button
-                onClick={() => setIsVaultOpen((prev) => !prev)}
-                title="Click to Open/Close Vault Lid"
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                  isVaultOpen
-                    ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                    : 'bg-[#2D68FF] text-white font-semibold shadow-[0_0_15px_rgba(45,104,255,0.6)]'
+                onClick={handleSpinDial}
+                title="Click to Spin Vault Combination Wheel"
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                  isDialSpinning
+                    ? 'bg-amber-500/25 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                    : 'bg-[#2D68FF] text-white font-semibold shadow-[0_0_10px_rgba(45,104,255,0.5)]'
                 }`}
               >
-                {isVaultOpen ? (
-                  <>
-                    <Unlock className="w-3 h-3 text-emerald-300" />
-                    <span>Lid Open</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-3 h-3 text-white" />
-                    <span>Open Vault</span>
-                  </>
-                )}
+                <RefreshCw className={`w-3 h-3 ${isDialSpinning ? 'animate-spin' : ''}`} />
+                <span>Spin Dial</span>
               </button>
             </>
           )}
 
           <button
             onClick={() => setMode('three')}
-            title="Switch to Three.js Vault Model"
+            title="Switch to 3D Safe Vault"
             className={`px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer ${
               mode === 'three'
                 ? 'bg-white/20 text-white font-semibold'
                 : 'text-[#858B9E] hover:text-white'
             }`}
           >
-            3D Model
+            3D Vault
           </button>
 
           <button
@@ -801,7 +697,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#070A14]">
           <img
             src={posterFallback}
-            alt="APEX 3D Vault Poster"
+            alt="APEX 3D Safe Vault Poster"
             className="w-full h-full object-cover opacity-85"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0C] via-transparent to-transparent opacity-80" />
@@ -811,12 +707,12 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         </div>
       ) : (
         <>
-          {/* Mode 1: Three.js Interactive WebGL 3D Vault */}
+          {/* Mode 1: Three.js Interactive WebGL 3D Safe Vault */}
           {mode === 'three' && (
             <div
               className="w-full h-full relative cursor-grab active:cursor-grabbing"
-              onClick={() => setIsVaultOpen((prev) => !prev)}
-              title="Click to toggle vault lid open/closed"
+              onClick={handleSpinDial}
+              title="Click and drag to rotate vault • Click to spin combination dial"
             >
               <canvas
                 ref={canvasRef}
@@ -848,7 +744,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#070A14] gap-3">
           <div className="w-10 h-10 rounded-full border-2 border-[#2D68FF]/30 border-t-[#00F0FF] animate-spin shadow-[0_0_20px_#2D68FF]" />
           <div className="text-xs font-mono text-[#A1B5E8] tracking-widest uppercase">
-            Fabricating Titanium Vault...
+            Loading 3D Safe Vault Model...
           </div>
         </div>
       )}
@@ -857,11 +753,11 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       <div className="absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 text-[10px] font-mono text-[#A1B5E8] bg-black/75 backdrop-blur-md px-3 py-1 rounded-lg border border-[#2D68FF]/30 shadow-lg">
           <Rotate3d className="w-3.5 h-3.5 text-[#00F0FF]" />
-          <span>Drag to Rotate • Click Vault to Open Lid</span>
+          <span>Drag to Rotate 360° • Click to Spin Lock Dial</span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-mono text-[#00F0FF] bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#00F0FF]/40 shadow-[0_0_12px_rgba(0,240,255,0.3)] hidden sm:flex">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-ping" />
-          <span>Electric Cobalt + Platinum Milled</span>
+          <span>safe_vault.glb • 24K Gold & Electric Cobalt PBR</span>
         </div>
       </div>
     </div>
