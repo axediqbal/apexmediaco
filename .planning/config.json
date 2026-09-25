@@ -1,0 +1,22 @@
+{
+  "workflow": {
+    "auto_plan": true,
+    "verify_uat": true,
+    "atomic_commits": true
+  },
+  "brand": {
+    "name": "APEX MEDIA CO",
+    "theme": "dark-first",
+    "primary_accent": "Electric Cobalt Blue",
+    "accent_hex": "#2D68FF",
+    "background_hex": "#0A0A0C"
+  },
+  "stack": {
+    "framework": "Next.js (App Router)",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS with Custom Tokens",
+    "animations": "GSAP + ScrollTrigger + Motion",
+    "database": "MongoDB + Mongoose",
+    "icons": "Lucide React"
+  }
+}
