@@ -90,7 +90,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05; // Balanced, prevents flat blown-out white
+    renderer.toneMappingExposure = 1.22; // High-radiance exposure brings out authentic museum brass-gold gleam
     rendererRef.current = renderer;
 
     // 4. Realistic Studio Environment (RoomEnvironment + PMREM)
@@ -100,54 +100,13 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     const envTexture = pmremGenerator.fromScene(roomEnv, 0.04).texture;
     scene.environment = envTexture;
 
-    // --- PROCEDURAL TEXTURES (Crafted specifically to match the user's reference vault) ---
-    // 1. Shimmering 24K Gold Mosaic Tile Texture for Vault Door
-    const createGoldMosaicTexture = (): THREE.CanvasTexture => {
-      const c = document.createElement('canvas');
-      c.width = 512;
-      c.height = 512;
-      const ctx = c.getContext('2d')!;
-
-      // Rich gold base gradient
-      const baseGrad = ctx.createLinearGradient(0, 0, 512, 512);
-      baseGrad.addColorStop(0, '#c79c32');
-      baseGrad.addColorStop(0.3, '#f5d372');
-      baseGrad.addColorStop(0.7, '#d4af37');
-      baseGrad.addColorStop(1, '#a87c20');
-      ctx.fillStyle = baseGrad;
-      ctx.fillRect(0, 0, 512, 512);
-
-      // Micro mosaic tiles grid
-      const tileSize = 16;
-      const gap = 1.6;
-      for (let y = 0; y < 512; y += tileSize) {
-        for (let x = 0; x < 512; x += tileSize) {
-          const jitter = (Math.random() - 0.5) * 40;
-          const r = Math.min(255, Math.max(180, Math.floor(224 + jitter)));
-          const g = Math.min(255, Math.max(140, Math.floor(182 + jitter * 0.85)));
-          const b = Math.min(255, Math.max(30, Math.floor(62 + jitter * 0.4)));
-
-          ctx.fillStyle = `rgb(${r},${g},${b})`;
-          ctx.fillRect(x + gap / 2, y + gap / 2, tileSize - gap, tileSize - gap);
-
-          // Specular bevel highlight on top and left edge of each tile
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
-          ctx.fillRect(x + gap / 2, y + gap / 2, tileSize - gap, 1.4);
-          ctx.fillRect(x + gap / 2, y + gap / 2, 1.4, tileSize - gap);
-
-          // Cast shadow on bottom and right edge of each tile
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
-          ctx.fillRect(x + gap / 2, y + tileSize - gap / 2 - 1.4, tileSize - gap, 1.4);
-          ctx.fillRect(x + tileSize - gap / 2 - 1.4, y + gap / 2, 1.4, tileSize - gap);
-        }
-      }
-
-      const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(2, 2);
-      return tex;
-    };
+    // --- REAL PHOTOGRAPHIC & PROCEDURAL TEXTURES (Matching user's reference photo) ---
+    // 1. Real 24K Gold Mosaic Texture extracted directly from user's uploaded photograph
+    const textureLoader = new THREE.TextureLoader();
+    const realGoldMosaicTexture = textureLoader.load('/images/gold-mosaic-pure.jpg');
+    realGoldMosaicTexture.wrapS = THREE.RepeatWrapping;
+    realGoldMosaicTexture.wrapT = THREE.RepeatWrapping;
+    realGoldMosaicTexture.repeat.set(1.4, 1.4);
 
     // 2. Architectural Gallery Slate Blue Texture for Interior Chamber
     const createBlueGalleryTexture = (): THREE.CanvasTexture => {
@@ -223,48 +182,52 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       return new THREE.CanvasTexture(c);
     };
 
-    const goldMosaicTexture = createGoldMosaicTexture();
     const blueGalleryTexture = createBlueGalleryTexture();
     const galleryArtworkTexture = createGalleryArtworkTexture();
 
-    // 5. BALANCED STUDIO LIGHTING (Tailored for dazzling Gold body + deep Blue interior)
+    // 5. BALANCED STUDIO LIGHTING (Museum Spotlights + Rich Metallic Speculars)
     // A. Soft Ambient Base Light
-    const ambientLight = new THREE.AmbientLight(0xe8edf5, 0.9);
+    const ambientLight = new THREE.AmbientLight(0xfff8ee, 1.1);
     scene.add(ambientLight);
 
     // B. Studio Key Light (Brings out rich golden shimmer and bevels)
-    const keyLight = new THREE.DirectionalLight(0xfff7e6, 2.8);
-    keyLight.position.set(4, 6, 5);
+    const keyLight = new THREE.DirectionalLight(0xfff7e8, 3.4);
+    keyLight.position.set(4, 7, 5);
     scene.add(keyLight);
 
     // C. Fill Light (Cool Blue Fill complimenting the interior)
-    const fillLight = new THREE.DirectionalLight(0x93c5fd, 1.4);
+    const fillLight = new THREE.DirectionalLight(0xbfdbfe, 1.6);
     fillLight.position.set(-5, 3, 4);
     scene.add(fillLight);
 
     // D. Warm Golden Specular Light (Highlights 24K Gold Body and Wheel)
-    const goldAccentLight = new THREE.DirectionalLight(0xffc857, 2.5);
-    goldAccentLight.position.set(3, 0, 4);
+    const goldAccentLight = new THREE.DirectionalLight(0xffdf78, 3.0);
+    goldAccentLight.position.set(3, 1, 4);
     scene.add(goldAccentLight);
 
-    // E. APEX Signature Cobalt Rim Light (Back Chamfer Highlights)
-    const cobaltRimLight = new THREE.DirectionalLight(0x38bdf8, 2.2);
+    // E. Overhead Museum Spotlight (Mimics the gallery spotlight above the gold portal)
+    const museumSpot = new THREE.DirectionalLight(0xfff4db, 2.2);
+    museumSpot.position.set(0, 8, 2);
+    scene.add(museumSpot);
+
+    // F. APEX Signature Cobalt Rim Light (Back Chamfer Highlights)
+    const cobaltRimLight = new THREE.DirectionalLight(0x38bdf8, 2.4);
     cobaltRimLight.position.set(-1, 5, -5);
     scene.add(cobaltRimLight);
 
-    // F. Cursor-Interactive Dynamic Specular Light
-    const pointLight = new THREE.PointLight(0xfff5db, 1.8, 12);
+    // G. Cursor-Interactive Dynamic Specular Light
+    const pointLight = new THREE.PointLight(0xfff5db, 2.0, 12);
     pointLight.position.set(0, 2, 4);
     scene.add(pointLight);
     pointLightRef.current = pointLight;
 
-    // G. Concealed Vault Interior Light (Atmospheric Gallery Blue Glow seen through the open door)
-    const interiorLight = new THREE.PointLight(0x38bdf8, 3.4, 15);
+    // H. Concealed Vault Interior Light (Atmospheric Gallery Blue Glow seen through the open door)
+    const interiorLight = new THREE.PointLight(0x38bdf8, 3.6, 16);
     interiorLight.position.set(0.1, 0.5, -0.3);
     scene.add(interiorLight);
 
-    // H. Deep Interior Royal Blue Fill Light
-    const deepBlueLight = new THREE.PointLight(0x1d4ed8, 2.5, 12);
+    // I. Deep Interior Royal Blue Fill Light
+    const deepBlueLight = new THREE.PointLight(0x1d4ed8, 2.8, 12);
     deepBlueLight.position.set(0.0, 0.3, -1.0);
     scene.add(deepBlueLight);
 
@@ -276,65 +239,71 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
     rootGroupRef.current = rootGroup;
     scene.add(rootGroup);
 
-    // 7. PBR MATERIALS: AUTHENTIC 24K IMPERIAL GOLD BODY & BLUE GALLERY INTERIOR
-    // A. Outer Armor Chassis & Walls (Solid Brushed 24K Imperial Gold)
+    // 7. PBR MATERIALS: PHOTOREALISTIC 24K IMPERIAL GOLD BODY & BLUE GALLERY INTERIOR
+    // A. Outer Armor Chassis & Walls (Pure 100% PBR Conductor Metal - Brushed 24K Imperial Brass-Gold)
     const matGoldChassis = new THREE.MeshPhysicalMaterial({
-      color: 0xdfb74a, // Rich Imperial Gold
-      metalness: 0.94,
-      roughness: 0.18,
-      clearcoat: 0.85,
-      clearcoatRoughness: 0.1,
+      color: 0xdfb040, // Authentic 24K Imperial Gold
+      metalness: 1.0,  // 100% pure PBR conductor metal
+      roughness: 0.12, // Silky satin polish
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.08,
       reflectivity: 1.0,
+      envMapIntensity: 2.6, // High metallic showroom reflection
     });
 
-    // B. Vault Door Face (Shimmering 24K Gold Mosaic Tiles - matching reference photo)
+    // B. Vault Door Face (Real Bisazza Gold Mosaic Tiles from uploaded photograph)
     const matGoldMosaicDoor = new THREE.MeshPhysicalMaterial({
-      color: 0xffe270,
-      map: goldMosaicTexture,
-      bumpMap: goldMosaicTexture,
-      bumpScale: 0.035,
-      metalness: 0.96,
-      roughness: 0.14,
+      color: 0xfff6c7,
+      map: realGoldMosaicTexture,
+      bumpMap: realGoldMosaicTexture,
+      bumpScale: 0.045,
+      metalness: 0.94,
+      roughness: 0.15,
       clearcoat: 1.0,
       clearcoatRoughness: 0.08,
       reflectivity: 1.0,
+      envMapIntensity: 2.4,
     });
 
-    // C. Door Inset Accent Plate & Trim (Rich Polished 24K Gold)
+    // C. Door Inset Accent Plate & Trim (Rich Polished Imperial Gold)
     const matGoldInset = new THREE.MeshPhysicalMaterial({
-      color: 0xf5c842,
-      metalness: 0.96,
-      roughness: 0.12,
+      color: 0xebc354,
+      metalness: 1.0,
+      roughness: 0.08,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.05,
+      clearcoatRoughness: 0.04,
       reflectivity: 1.0,
+      envMapIntensity: 2.8,
     });
 
     // D. 5-Spoke Combination Lock Wheel & Center Hub (Solid Mirror-Polished 24K Pure Gold)
     const matGoldWheel = new THREE.MeshPhysicalMaterial({
-      color: 0xf59e0b, // Radiant 24K Gold
-      metalness: 0.99,
-      roughness: 0.04,
+      color: 0xf5cf66, // Radiant Mirror-Polished Gold
+      metalness: 1.0,
+      roughness: 0.03, // Mirror reflection
       clearcoat: 1.0,
-      clearcoatRoughness: 0.03,
+      clearcoatRoughness: 0.02,
       reflectivity: 1.0,
+      envMapIntensity: 3.2,
     });
 
     // E. Heavy Locking Bolts & Hinge Pins (Solid Mirror-Polished Gold)
     const matGoldBolts = new THREE.MeshPhysicalMaterial({
-      color: 0xf3c64c,
-      metalness: 0.98,
-      roughness: 0.05,
+      color: 0xf0c75c,
+      metalness: 1.0,
+      roughness: 0.04,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.03,
+      clearcoatRoughness: 0.02,
       reflectivity: 1.0,
+      envMapIntensity: 2.8,
     });
 
     // F. Heavy Hinge Blocks & Brackets (Solid Forged Imperial Gold)
     const matGoldHinges = new THREE.MeshStandardMaterial({
-      color: 0xdfb74a,
-      metalness: 0.94,
+      color: 0xdfb040,
+      metalness: 1.0,
       roughness: 0.15,
+      envMapIntensity: 2.2,
     });
 
     // G. Biometric Optical Tumbler Core (Electric Cobalt Core Indicator)
@@ -716,7 +685,7 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       matCore.dispose();
       matInteriorBlue.dispose();
       matInteriorFloor.dispose();
-      goldMosaicTexture.dispose();
+      realGoldMosaicTexture.dispose();
       blueGalleryTexture.dispose();
       galleryArtworkTexture.dispose();
     };
@@ -734,9 +703,9 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       {/* Top Visual Badge (Clean, Minimal, No Control Bar) */}
       <div className="absolute top-3 left-3 z-30 pointer-events-none">
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0A0E1A]/90 backdrop-blur-md border border-white/15 shadow-lg">
-          <Shield className="w-3.5 h-3.5 text-[#5A8BFF]" />
+          <Shield className="w-3.5 h-3.5 text-[#EAB308]" />
           <span className="text-[11px] font-mono text-[#F8F9FD] tracking-wider uppercase font-semibold">
-            APEX Executive Vault • 24K Gold & Brushed Steel
+            APEX Monolith Vault • 24K Imperial Gold
           </span>
         </div>
       </div>
