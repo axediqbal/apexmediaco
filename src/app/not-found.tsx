@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Compass } from 'lucide-react';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
-import Button from '@/components/ui/Button';
+import { buttonClassNames } from '@/components/ui/Button';
 
 export default function NotFound() {
   return (
@@ -39,15 +39,12 @@ export default function NotFound() {
             </div>
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-              <Link href="/">
-                <Button variant="primary" leftIcon={<ArrowLeft className="w-4 h-4" />}>
-                  Return to Headquarters
-                </Button>
+              <Link href="/" className={buttonClassNames('primary', 'md')}>
+                <span className="shrink-0"><ArrowLeft className="w-4 h-4" /></span>
+                <span>Return to Headquarters</span>
               </Link>
-              <Link href="/products">
-                <Button variant="outline">
-                  Browse Active Catalog
-                </Button>
+              <Link href="/products" className={buttonClassNames('outline', 'md')}>
+                <span>Browse Active Catalog</span>
               </Link>
             </div>
           </GlassCard>

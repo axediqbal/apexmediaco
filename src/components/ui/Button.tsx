@@ -16,6 +16,44 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   rightIcon?: React.ReactNode;
 }
 
+export type ButtonVariant = NonNullable<ButtonProps['variant']>;
+export type ButtonSize = NonNullable<ButtonProps['size']>;
+
+const buttonBaseStyles =
+  'inline-flex items-center justify-center font-medium transition-all duration-200 select-none cursor-pointer rounded-xl disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]';
+
+const buttonSizeStyles: Record<ButtonSize, string> = {
+  sm: 'text-xs px-3.5 py-1.5 gap-1.5 h-8',
+  md: 'text-sm px-5 py-2.5 gap-2 h-11',
+  lg: 'text-base px-7 py-3.5 gap-2.5 h-13 font-semibold',
+};
+
+const buttonVariantStyles: Record<ButtonVariant, string> = {
+  primary:
+    'bg-[#2D68FF] text-white hover:bg-[#3D75FF] hover:shadow-[0_0_28px_rgba(45,104,255,0.45)] border border-[#5A8BFF]/40 active:bg-[#1A42AA]',
+  secondary:
+    'bg-[#181822]/80 text-[#F8F9FD] backdrop-blur-md border border-white/10 hover:border-white/25 hover:bg-[#20202E] hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
+  outline:
+    'bg-transparent text-[#F8F9FD] border border-[#2D68FF]/50 hover:border-[#2D68FF] hover:bg-[#2D68FF]/10 hover:shadow-[0_0_20px_rgba(45,104,255,0.2)]',
+  ghost:
+    'bg-transparent text-[#9FA5B9] hover:text-[#F8F9FD] hover:bg-white/5 active:bg-white/10',
+  danger:
+    'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 hover:border-red-500/60',
+};
+
+/**
+ * buttonClassNames — the same visual treatment as <Button>, for elements
+ * that cannot be a <button> (e.g. Next.js <Link>). Use this instead of
+ * nesting <Button> inside <Link>, which produces invalid <a><button></a> markup.
+ */
+export function buttonClassNames(
+  variant: ButtonVariant = 'primary',
+  size: ButtonSize = 'md',
+  className?: string
+): string {
+  return twMerge(clsx(buttonBaseStyles, buttonSizeStyles[size], buttonVariantStyles[variant], className));
+}
+
 /**
  * Button — Kinetic High-Impact Agency CTA Component
  * 
@@ -43,27 +81,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all duration-200 select-none cursor-pointer rounded-xl disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]';
+    const baseStyles = buttonBaseStyles;
 
-    const sizeStyles = {
-      sm: 'text-xs px-3.5 py-1.5 gap-1.5 h-8',
-      md: 'text-sm px-5 py-2.5 gap-2 h-11',
-      lg: 'text-base px-7 py-3.5 gap-2.5 h-13 font-semibold',
-    };
+    const sizeStyles = buttonSizeStyles;
 
-    const variantStyles = {
-      primary:
-        'bg-[#2D68FF] text-white hover:bg-[#3D75FF] hover:shadow-[0_0_28px_rgba(45,104,255,0.45)] border border-[#5A8BFF]/40 active:bg-[#1A42AA]',
-      secondary:
-        'bg-[#181822]/80 text-[#F8F9FD] backdrop-blur-md border border-white/10 hover:border-white/25 hover:bg-[#20202E] hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
-      outline:
-        'bg-transparent text-[#F8F9FD] border border-[#2D68FF]/50 hover:border-[#2D68FF] hover:bg-[#2D68FF]/10 hover:shadow-[0_0_20px_rgba(45,104,255,0.2)]',
-      ghost:
-        'bg-transparent text-[#9FA5B9] hover:text-[#F8F9FD] hover:bg-white/5 active:bg-white/10',
-      danger:
-        'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 hover:border-red-500/60',
-    };
+    const variantStyles = buttonVariantStyles;
 
     return (
       <button

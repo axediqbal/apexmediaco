@@ -8,11 +8,32 @@ import Container from '@/components/ui/Container';
 export const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
+    if (!email.trim() || isSubscribing) return;
+
+    setIsSubscribing(true);
+    setSubscribeError(null);
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setSubscribed(true);
+      } else {
+        setSubscribeError(result.message || 'Could not subscribe. Please try again.');
+      }
+    } catch {
+      setSubscribeError('Could not reach the subscription server. Please try again.');
+    } finally {
+      setIsSubscribing(false);
     }
   };
 
@@ -124,14 +145,21 @@ export const Footer: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter corporate email"
+                    aria-label="Email for Agency Dispatch newsletter"
                     className="w-full text-xs bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-[#F5F5F8] placeholder-[#71717A] focus:border-[#2D68FF] outline-none transition-colors"
                   />
                 </div>
+                {subscribeError && (
+                  <p role="alert" className="text-[11px] text-red-400">
+                    {subscribeError}
+                  </p>
+                )}
                 <button
                   type="submit"
-                  className="w-full text-xs font-semibold uppercase tracking-wider py-2 rounded-xl bg-[#2D68FF] text-white hover:bg-[#3D75FF] transition-all shadow-[0_0_15px_rgba(45,104,255,0.3)]"
+                  disabled={isSubscribing}
+                  className="w-full text-xs font-semibold uppercase tracking-wider py-2 rounded-xl bg-[#2D68FF] text-white hover:bg-[#3D75FF] transition-all shadow-[0_0_15px_rgba(45,104,255,0.3)] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Join Dispatch
+                  {isSubscribing ? 'Joining…' : 'Join Dispatch'}
                 </button>
               </form>
             )}

@@ -90,3 +90,18 @@ export interface OrderRecord {
   paymentMethod: 'invoice' | 'corporate-card';
   notes?: string;
 }
+
+export interface NewsletterSubscription {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  productId: string;
+  productName: string;
+  email: string;
+  name?: string;
+  createdAt: string;
+}

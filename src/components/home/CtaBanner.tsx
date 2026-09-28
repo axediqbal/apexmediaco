@@ -18,11 +18,11 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import Container from '@/components/ui/Container';
-import Button from '@/components/ui/Button';
+import { buttonClassNames } from '@/components/ui/Button';
 
 export const CtaBanner: React.FC = () => {
   return (
-    <section className="py-20 md:py-28 relative overflow-hidden">
+    <section className="py-14 md:py-24 relative overflow-hidden">
       <Container size="xl">
         <div
           data-gsap-card="true"
@@ -54,24 +54,20 @@ export const CtaBanner: React.FC = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link href="/products">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="shadow-[0_0_30px_rgba(45,104,255,0.45)] hover:shadow-[0_0_45px_rgba(45,104,255,0.6)] transition-all"
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                >
-                  Order Collateral Online
-                </Button>
+              <Link
+                href="/products"
+                className={buttonClassNames(
+                  'primary',
+                  'lg',
+                  'shadow-[0_0_30px_rgba(45,104,255,0.45)] hover:shadow-[0_0_45px_rgba(45,104,255,0.6)]'
+                )}
+              >
+                <span>Order Collateral Online</span>
+                <span className="shrink-0"><ArrowRight className="w-4 h-4" /></span>
               </Link>
 
-              <Link href="/checkout">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                >
-                  Direct Agency PO Checkout
-                </Button>
+              <Link href="/checkout" className={buttonClassNames('secondary', 'lg')}>
+                <span>Direct Agency PO Checkout</span>
               </Link>
             </div>
 

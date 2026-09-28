@@ -26,7 +26,7 @@ import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import Input from '@/components/ui/Input';
 import Image from 'next/image';
-import Button from '@/components/ui/Button';
+import Button, { buttonClassNames } from '@/components/ui/Button';
 
 type CheckoutStep = 'shipping' | 'logistics' | 'review' | 'confirmed';
 
@@ -234,10 +234,9 @@ export const CheckoutFlow: React.FC = () => {
               You must have at least one collateral kit in your cart to proceed with agency checkout.
             </p>
             <div className="pt-2">
-              <Link href="/products">
-                <Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  Explore Collateral Kits
-                </Button>
+              <Link href="/products" className={buttonClassNames('primary', 'md')}>
+                <span>Explore Collateral Kits</span>
+                <span className="shrink-0"><ArrowRight className="w-4 h-4" /></span>
               </Link>
             </div>
           </GlassCard>
@@ -338,10 +337,8 @@ export const CheckoutFlow: React.FC = () => {
               >
                 Print PO Receipt
               </Button>
-              <Link href="/products">
-                <Button variant="primary">
-                  Return to Collateral Catalog
-                </Button>
+              <Link href="/products" className={buttonClassNames('primary', 'md')}>
+                <span>Return to Collateral Catalog</span>
               </Link>
             </div>
           </GlassCard>
@@ -543,7 +540,9 @@ export const CheckoutFlow: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="space-y-3">
+                <fieldset>
+                  <legend className="sr-only">Select logistics speed</legend>
+                  <div className="space-y-3">
                   {[
                     {
                       id: 'standard',
@@ -562,15 +561,22 @@ export const CheckoutFlow: React.FC = () => {
                       image: '/images/logistics/terminal-night.jpg',
                     },
                   ].map((opt) => (
-                    <div
+                    <label
                       key={opt.id}
-                      onClick={() => setShippingMethod(opt.id as any)}
-                      className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-4 ${
+                      className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-4 focus-within:ring-2 focus-within:ring-[#2D68FF]/60 ${
                         shippingMethod === opt.id
                           ? 'bg-[#2D68FF]/15 border-[#2D68FF] shadow-[0_0_20px_rgba(45,104,255,0.25)]'
                           : 'bg-white/[0.02] border-white/10 hover:border-white/20'
                       }`}
                     >
+                      <input
+                        type="radio"
+                        name="shipping-method"
+                        value={opt.id}
+                        checked={shippingMethod === opt.id}
+                        onChange={() => setShippingMethod(opt.id as 'standard' | 'express' | 'white-glove')}
+                        className="sr-only"
+                      />
                       <div className="flex items-start gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
@@ -601,9 +607,10 @@ export const CheckoutFlow: React.FC = () => {
                       <span className="text-xs font-bold text-[#F5F5F8] font-mono shrink-0">
                         {opt.price}
                       </span>
-                    </div>
+                    </label>
                   ))}
-                </div>
+                  </div>
+                </fieldset>
 
                 <div className="pt-4 flex items-center justify-between border-t border-white/[0.08]">
                   <Button
@@ -645,33 +652,48 @@ export const CheckoutFlow: React.FC = () => {
                 </div>
 
                 {/* Method Switcher */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('invoice')}
-                    className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono uppercase transition-all cursor-pointer ${
-                      paymentMethod === 'invoice'
-                        ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.3)]'
-                        : 'bg-white/[0.03] border-white/10 text-[#71717A] hover:text-white'
-                    }`}
-                  >
-                    <FileText className="w-4 h-4" />
-                    <span>Net-30 Corporate PO</span>
-                  </button>
+                <fieldset>
+                  <legend className="sr-only">Payment method</legend>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label
+                      className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono uppercase transition-all cursor-pointer focus-within:ring-2 focus-within:ring-[#2D68FF]/60 ${
+                        paymentMethod === 'invoice'
+                          ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.3)]'
+                          : 'bg-white/[0.03] border-white/10 text-[#71717A] hover:text-white'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="invoice"
+                        checked={paymentMethod === 'invoice'}
+                        onChange={() => setPaymentMethod('invoice')}
+                        className="sr-only"
+                      />
+                      <FileText className="w-4 h-4" />
+                      <span>Net-30 Corporate PO</span>
+                    </label>
 
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('corporate-card')}
-                    className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono uppercase transition-all cursor-pointer ${
-                      paymentMethod === 'corporate-card'
-                        ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.3)]'
-                        : 'bg-white/[0.03] border-white/10 text-[#71717A] hover:text-white'
-                    }`}
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    <span>Corporate Card</span>
-                  </button>
-                </div>
+                    <label
+                      className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono uppercase transition-all cursor-pointer focus-within:ring-2 focus-within:ring-[#2D68FF]/60 ${
+                        paymentMethod === 'corporate-card'
+                          ? 'bg-[#2D68FF]/20 border-[#2D68FF] text-white shadow-[0_0_15px_rgba(45,104,255,0.3)]'
+                          : 'bg-white/[0.03] border-white/10 text-[#71717A] hover:text-white'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="corporate-card"
+                        checked={paymentMethod === 'corporate-card'}
+                        onChange={() => setPaymentMethod('corporate-card')}
+                        className="sr-only"
+                      />
+                      <CreditCard className="w-4 h-4" />
+                      <span>Corporate Card</span>
+                    </label>
+                  </div>
+                </fieldset>
 
                 {/* Form fields depending on method */}
                 {paymentMethod === 'invoice' ? (

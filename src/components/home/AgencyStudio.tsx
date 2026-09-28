@@ -74,13 +74,13 @@ export const AgencyStudio: React.FC = () => {
   const [activePhoto, setActivePhoto] = useState<StudioPhoto | null>(null);
 
   return (
-    <section id="studio" className="py-20 md:py-32 relative overflow-hidden">
+    <section id="studio" className="py-14 md:py-24 relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[150px] pointer-events-none rounded-full" />
 
       <Container size="xl">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />

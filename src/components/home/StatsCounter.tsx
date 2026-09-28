@@ -63,7 +63,7 @@ export const StatsCounter: React.FC = () => {
   }, []);
 
   return (
-    <section ref={containerRef} className="py-20 border-y border-white/[0.08] bg-[#070709] relative overflow-hidden">
+    <section ref={containerRef} className="py-14 md:py-20 border-y border-white/[0.08] bg-[#070709] relative overflow-hidden">
       {/* Background soft cobalt gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#2D68FF]/5 to-transparent pointer-events-none" />
 

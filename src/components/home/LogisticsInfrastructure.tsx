@@ -96,13 +96,13 @@ export const LogisticsInfrastructure: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<HubPhoto | null>(null);
 
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden">
+    <section className="py-14 md:py-24 relative overflow-hidden">
       {/* Background ambient flare */}
       <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#2D68FF]/5 blur-[160px] pointer-events-none rounded-full" />
 
       <Container size="xl">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Truck className="w-3.5 h-3.5" />

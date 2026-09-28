@@ -2,8 +2,10 @@ import { connectToDatabase } from './db';
 import { Product } from '@/models/Product';
 import { Order } from '@/models/Order';
 import { Cart } from '@/models/Cart';
+import { NewsletterSubscriber } from '@/models/NewsletterSubscriber';
+import { WaitlistEntryModel } from '@/models/WaitlistEntry';
 import { SEED_PRODUCTS } from '@/data/seedData';
-import { ProductItem, OrderRecord, CartRecord, CartItemRecord } from '@/types';
+import { ProductItem, OrderRecord, CartRecord, CartItemRecord, NewsletterSubscription, WaitlistEntry } from '@/types';
 
 /**
  * In-memory fallback stores (active when MONGODB_URI is absent or offline).
@@ -12,6 +14,8 @@ import { ProductItem, OrderRecord, CartRecord, CartItemRecord } from '@/types';
 let inMemoryProducts: ProductItem[] = [...SEED_PRODUCTS];
 const inMemoryOrders: OrderRecord[] = [];
 const inMemoryCarts: Map<string, CartRecord> = new Map();
+const inMemoryNewsletter: NewsletterSubscription[] = [];
+const inMemoryWaitlist: WaitlistEntry[] = [];
 
 /**
  * seedProducts — Seeds or re-seeds the catalog with APEX collateral kits.
@@ -452,4 +456,123 @@ export async function clearCart(sessionId: string): Promise<boolean> {
 
   inMemoryCarts.delete(sessionId);
   return true;
+}
+
+/**
+ * subscribeNewsletter — Adds an email to the Agency Dispatch list.
+ * Idempotent: subscribing twice returns the existing record with isNew=false.
+ */
+export async function subscribeNewsletter(email: string): Promise<{ subscription: NewsletterSubscription; isNew: boolean }> {
+  const normalized = email.trim().toLowerCase();
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const existing = await NewsletterSubscriber.findOne({ email: normalized }).lean();
+      if (existing) {
+        const e = existing as any;
+        return {
+          subscription: {
+            id: e._id?.toString() || e.id,
+            email: e.email,
+            createdAt: e.createdAt ? new Date(e.createdAt).toISOString() : new Date().toISOString(),
+          },
+          isNew: false,
+        };
+      }
+      const doc = await NewsletterSubscriber.create({ email: normalized });
+      const d = doc.toJSON() as any;
+      return {
+        subscription: { id: d.id, email: d.email, createdAt: d.createdAt },
+        isNew: true,
+      };
+    } catch (err) {
+      console.warn('[APEX DB] Newsletter subscribe failed in MongoDB, using memory', err);
+    }
+  }
+
+  const existingMem = inMemoryNewsletter.find((s) => s.email === normalized);
+  if (existingMem) {
+    return { subscription: existingMem, isNew: false };
+  }
+  const subscription: NewsletterSubscription = {
+    id: `nl_${Date.now()}`,
+    email: normalized,
+    createdAt: new Date().toISOString(),
+  };
+  inMemoryNewsletter.unshift(subscription);
+  return { subscription, isNew: true };
+}
+
+/**
+ * joinWaitlist — Adds an email to a sold-out product's pre-order waitlist.
+ * Idempotent per (productId, email): re-joining returns the existing entry.
+ */
+export async function joinWaitlist(
+  productId: string,
+  email: string,
+  name?: string
+): Promise<{ entry: WaitlistEntry; isNew: boolean }> {
+  const normalized = email.trim().toLowerCase();
+  const product = await fetchProductById(productId);
+  if (!product) {
+    throw new Error(`Unknown product: ${productId}`);
+  }
+
+  const { isConnected, mode } = await connectToDatabase();
+
+  if (isConnected && mode === 'mongodb') {
+    try {
+      const existing = await WaitlistEntryModel.findOne({ productId: product.id, email: normalized }).lean();
+      if (existing) {
+        const e = existing as any;
+        return {
+          entry: {
+            id: e._id?.toString() || e.id,
+            productId: e.productId,
+            productName: e.productName,
+            email: e.email,
+            name: e.name,
+            createdAt: e.createdAt ? new Date(e.createdAt).toISOString() : new Date().toISOString(),
+          },
+          isNew: false,
+        };
+      }
+      const doc = await WaitlistEntryModel.create({
+        productId: product.id,
+        productName: product.name,
+        email: normalized,
+        name: name?.trim() || undefined,
+      });
+      const d = doc.toJSON() as any;
+      return {
+        entry: {
+          id: d.id,
+          productId: d.productId,
+          productName: d.productName,
+          email: d.email,
+          name: d.name,
+          createdAt: d.createdAt,
+        },
+        isNew: true,
+      };
+    } catch (err) {
+      console.warn('[APEX DB] Waitlist join failed in MongoDB, using memory', err);
+    }
+  }
+
+  const existingMem = inMemoryWaitlist.find((w) => w.productId === product.id && w.email === normalized);
+  if (existingMem) {
+    return { entry: existingMem, isNew: false };
+  }
+  const entry: WaitlistEntry = {
+    id: `wl_${Date.now()}`,
+    productId: product.id,
+    productName: product.name,
+    email: normalized,
+    name: name?.trim() || undefined,
+    createdAt: new Date().toISOString(),
+  };
+  inMemoryWaitlist.unshift(entry);
+  return { entry, isNew: true };
 }

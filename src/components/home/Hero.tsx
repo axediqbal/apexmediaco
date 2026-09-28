@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Shield } from 'lucide-react';
 import Container from '@/components/ui/Container';
-import Button from '@/components/ui/Button';
+import { buttonClassNames } from '@/components/ui/Button';
 import MagneticButton from '@/components/ui/MagneticButton';
 import HeroCenterpiece from './HeroCenterpiece';
 import PartnerMarquee from './PartnerMarquee';
@@ -67,27 +67,18 @@ export const Hero: React.FC = () => {
               className="flex flex-wrap items-center gap-4 pt-2 w-full sm:w-auto"
             >
               <MagneticButton strength={0.25} className="w-full sm:w-auto">
-                <Link href="/products" className="w-full sm:w-auto block">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full sm:w-auto shadow-[0_0_35px_rgba(45,104,255,0.45)]"
-                    rightIcon={<ArrowRight className="w-4 h-4" />}
-                  >
-                    Explore Collateral Kits
-                  </Button>
+                <Link
+                  href="/products"
+                  className={buttonClassNames('primary', 'lg', 'w-full sm:w-auto shadow-[0_0_35px_rgba(45,104,255,0.45)]')}
+                >
+                  <span>Explore Collateral Kits</span>
+                  <span className="shrink-0"><ArrowRight className="w-4 h-4" /></span>
                 </Link>
               </MagneticButton>
 
               <MagneticButton strength={0.18} className="w-full sm:w-auto">
-                <a href="#capabilities" className="w-full sm:w-auto block">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    className="w-full sm:w-auto"
-                  >
-                    Agency Capabilities
-                  </Button>
+                <a href="#capabilities" className={buttonClassNames('secondary', 'lg', 'w-full sm:w-auto')}>
+                  <span>Agency Capabilities</span>
                 </a>
               </MagneticButton>
             </motion.div>

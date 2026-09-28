@@ -22,7 +22,7 @@ import { useCart } from '@/context/CartContext';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
+import { buttonClassNames } from '@/components/ui/Button';
 import Image from 'next/image';
 import QuickSpecDrawer from '@/components/products/QuickSpecDrawer';
 
@@ -48,13 +48,13 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
   const featuredList = products.slice(0, 4);
 
   return (
-    <section className="py-20 md:py-28 relative">
+    <section className="py-14 md:py-24 relative">
       {/* Background glow accent */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[140px] pointer-events-none rounded-full" />
 
       <Container size="xl">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
@@ -68,10 +68,9 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
             </p>
           </div>
 
-          <Link href="/products">
-            <Button variant="outline" rightIcon={<ArrowRight className="w-4 h-4" />}>
-              Explore Full Catalog ({products.length})
-            </Button>
+          <Link href="/products" className={buttonClassNames('outline', 'md')}>
+            <span>Explore Full Catalog ({products.length})</span>
+            <span className="shrink-0"><ArrowRight className="w-4 h-4" /></span>
           </Link>
         </div>
 

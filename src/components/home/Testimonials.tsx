@@ -50,10 +50,10 @@ export const Testimonials: React.FC = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 md:py-32 relative">
+    <section id="testimonials" className="py-14 md:py-24 relative">
       <Container size="xl">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
+        <div className="text-center max-w-2xl mx-auto space-y-3 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Case Studies & Client Impact</span>

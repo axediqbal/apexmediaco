@@ -23,10 +23,10 @@ import GlassCard from '@/components/ui/GlassCard';
 
 export const BentoGrid: React.FC = () => {
   return (
-    <section id="capabilities" className="py-20 md:py-32 relative">
+    <section id="capabilities" className="py-14 md:py-24 relative">
       <Container size="xl">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D68FF]/10 border border-[#2D68FF]/30 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
