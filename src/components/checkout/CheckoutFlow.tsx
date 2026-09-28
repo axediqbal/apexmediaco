@@ -17,7 +17,8 @@ import {
   Mail, 
   User, 
   MapPin, 
-  Phone
+  Phone,
+  AlertTriangle
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { OrderRecord, CustomerInfo } from '@/types';
@@ -54,6 +55,7 @@ export const CheckoutFlow: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'invoice' | 'corporate-card'>('invoice');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<OrderRecord | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Form State
   const [customer, setCustomer] = useState<CustomerInfo>({
@@ -151,6 +153,7 @@ export const CheckoutFlow: React.FC = () => {
     if (cart.length === 0) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
     const adjustedShipping = shippingMethod === 'white-glove' ? shipping + 150 : shipping;
     const finalTotal = subtotal + adjustedShipping + tax;
@@ -198,28 +201,16 @@ export const CheckoutFlow: React.FC = () => {
           // graceful fallback if canvas not available
         }
       } else {
-        alert(result.message || 'Failed to place order. Please review your details.');
+        // Server rejected the order — keep the cart intact and let the user retry.
+        setSubmitError(result.message || 'Failed to place order. Please review your details and try again.');
       }
     } catch (err) {
       console.error('Checkout submission error:', err);
-      // Fallback simulated order creation
-      const fallbackOrder: OrderRecord = {
-        id: `ord_${Date.now()}`,
-        orderNumber: `APX-${Math.floor(100000 + Math.random() * 900000)}`,
-        createdAt: new Date().toISOString(),
-        customer,
-        items: payload.items,
-        subtotal,
-        shipping: adjustedShipping,
-        tax,
-        total: finalTotal,
-        shippingMethod,
-        status: 'Processing',
-        paymentMethod,
-      };
-      setConfirmedOrder(fallbackOrder);
-      clearCart();
-      setStep('confirmed');
+      // Network/API failure: NEVER fabricate a confirmation. Keep the cart
+      // intact so the user can retry once connectivity is restored.
+      setSubmitError(
+        'Could not reach the order server. Your cart has been kept — please check your connection and try again.'
+      );
     } finally {
       setIsSubmitting(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -737,6 +728,20 @@ export const CheckoutFlow: React.FC = () => {
                         error={errors.cvc}
                         onChange={(e) => setCardInfo({ ...cardInfo, cvc: e.target.value })}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {/* Submission Error */}
+                {submitError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.08] px-4 py-3"
+                  >
+                    <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-red-300">Order could not be placed</p>
+                      <p className="text-red-200/80 mt-1">{submitError}</p>
                     </div>
                   </div>
                 )}

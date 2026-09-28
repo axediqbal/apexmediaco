@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { submitOrder, fetchOrders, fetchProductById } from '@/lib/dataStore';
+import { isRateLimited, getClientIp } from '@/lib/rateLimit';
 
 /**
  * GET /api/orders — ADMIN ONLY.
@@ -54,6 +55,14 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   try {
+    // Abuse brake: max 10 order submissions per minute per client IP.
+    if (isRateLimited(`orders:${getClientIp(request)}`, { limit: 10, windowMs: 60_000 })) {
+      return NextResponse.json(
+        { success: false, message: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
 
     // Validation — customer details
