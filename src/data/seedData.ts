@@ -74,7 +74,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 620,
     category: 'VIP Kits',
     images: [
-      '/images/vault-gold.jpg',
+      '/images/products/vault-chest.jpg',
       '/images/agency/executive-boardroom.jpg',
       '/images/logistics/terminal-night.jpg',
       'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80'
@@ -106,7 +106,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 490,
     category: 'Digital Systems',
     images: [
-      '/images/agency/ai-creative-lab.jpg',
+      '/images/products/brand-guidelines.jpg',
       '/images/agency/creative-designers.jpg',
       '/images/agency/design-sprint-whiteboard.jpg',
       'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80'
@@ -169,7 +169,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 2450,
     category: 'Apparel',
     images: [
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1200&q=80',
+      '/images/products/swag-capsule.jpg',
       'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1200&q=80'
     ],

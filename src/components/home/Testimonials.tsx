@@ -50,7 +50,7 @@ export const Testimonials: React.FC = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-14 md:py-24 relative">
+    <section id="testimonials" className="py-10 md:py-16 relative">
       <Container size="xl">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-10">

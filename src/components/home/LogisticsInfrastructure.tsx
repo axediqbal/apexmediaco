@@ -96,7 +96,7 @@ export const LogisticsInfrastructure: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<HubPhoto | null>(null);
 
   return (
-    <section className="py-14 md:py-24 relative overflow-hidden">
+    <section className="py-10 md:py-16 relative overflow-hidden">
       {/* Background ambient flare */}
       <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#2D68FF]/5 blur-[160px] pointer-events-none rounded-full" />
 

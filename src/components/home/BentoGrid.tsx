@@ -23,7 +23,7 @@ import GlassCard from '@/components/ui/GlassCard';
 
 export const BentoGrid: React.FC = () => {
   return (
-    <section id="capabilities" className="py-14 md:py-24 relative">
+    <section id="capabilities" className="py-10 md:py-16 relative">
       <Container size="xl">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">

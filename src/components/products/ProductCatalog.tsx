@@ -266,11 +266,11 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({ initialProducts 
                           <span className="text-[#71717A]">({product.reviewsCount})</span>
                         </div>
 
-                        <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2">
+                        <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2 min-h-[2.5rem] leading-snug">
                           {product.name}
                         </h3>
 
-                        <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed min-h-[2rem]">
                           {product.tagline}
                         </p>
                       </div>

@@ -61,7 +61,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold tracking-tight text-[#F5F5F8] font-display flex items-center gap-1.5">
-                APEX <span className="text-[#2D68FF] text-xs font-mono px-1.5 py-0.5 rounded bg-[#2D68FF]/15 border border-[#2D68FF]/30">MEDIA CO</span>
+                APEX <span className="text-[#2D68FF] text-[13px] font-mono px-2 py-0.5 rounded-md bg-[#2D68FF]/15 border border-[#2D68FF]/30 tracking-wide">MEDIA CO</span>
               </span>
               <span className="text-[10px] text-[#71717A] tracking-wider uppercase font-mono">
                 National Collateral Systems

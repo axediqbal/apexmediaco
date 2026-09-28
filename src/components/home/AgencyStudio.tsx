@@ -74,7 +74,7 @@ export const AgencyStudio: React.FC = () => {
   const [activePhoto, setActivePhoto] = useState<StudioPhoto | null>(null);
 
   return (
-    <section id="studio" className="py-14 md:py-24 relative overflow-hidden">
+    <section id="studio" className="py-10 md:py-16 relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[150px] pointer-events-none rounded-full" />
 

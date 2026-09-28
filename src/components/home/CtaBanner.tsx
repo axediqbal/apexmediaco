@@ -22,7 +22,7 @@ import { buttonClassNames } from '@/components/ui/Button';
 
 export const CtaBanner: React.FC = () => {
   return (
-    <section className="py-14 md:py-24 relative overflow-hidden">
+    <section className="py-10 md:py-16 relative overflow-hidden">
       <Container size="xl">
         <div
           data-gsap-card="true"
@@ -39,7 +39,7 @@ export const CtaBanner: React.FC = () => {
           />
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#5A8BFF]/40 to-transparent pointer-events-none" />
 
-          <div className="relative z-10 max-w-2xl space-y-6">
+          <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2D68FF]/15 border border-[#2D68FF]/40 text-xs font-mono text-[#5A8BFF]">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Priority Campaign Allocation • 2026 Season</span>
@@ -49,11 +49,11 @@ export const CtaBanner: React.FC = () => {
               READY TO ELEVATE YOUR BRAND'S PHYSICAL ARTIFACTS?
             </h2>
 
-            <p className="text-sm sm:text-base text-[#A1A1B0] leading-relaxed">
+            <p className="text-sm sm:text-base text-[#A1A1B0] leading-relaxed max-w-2xl mx-auto">
               Order verified collateral kits directly from our curated inventory or collaborate with an APEX production architect for custom aerospace-grade kitting.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <Link
                 href="/products"
                 className={buttonClassNames(
@@ -71,7 +71,7 @@ export const CtaBanner: React.FC = () => {
               </Link>
             </div>
 
-            <div className="pt-6 border-t border-white/[0.08] flex items-center gap-6 text-xs text-[#71717A]">
+            <div className="pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#9FA5B9]">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>Pre-Approved Net-30 Terms for Fortune 500</span>

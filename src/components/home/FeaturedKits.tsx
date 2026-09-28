@@ -48,7 +48,7 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
   const featuredList = products.slice(0, 4);
 
   return (
-    <section className="py-14 md:py-24 relative">
+    <section className="py-10 md:py-16 relative">
       {/* Background glow accent */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#2D68FF]/5 blur-[140px] pointer-events-none rounded-full" />
 
@@ -135,11 +135,11 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
                           <span className="text-[#71717A]">({product.reviewsCount})</span>
                         </div>
 
-                        <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2">
+                        <h3 className="text-sm font-bold text-[#F5F5F8] group-hover:text-[#5A8BFF] transition-colors line-clamp-2 min-h-[2.5rem] leading-snug">
                           {product.name}
                         </h3>
 
-                        <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#71717A] mt-1.5 line-clamp-2 leading-relaxed min-h-[2rem]">
                           {product.tagline}
                         </p>
                       </div>

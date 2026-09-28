@@ -222,3 +222,19 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Infinite partner marquee */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+.marquee-paused:hover .animate-marquee {
+  animation-play-state: paused;
+}
