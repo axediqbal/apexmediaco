@@ -25,6 +25,7 @@ import { OrderRecord, CustomerInfo } from '@/types';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import Input from '@/components/ui/Input';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 
 type CheckoutStep = 'shipping' | 'logistics' | 'review' | 'confirmed';
@@ -582,8 +583,8 @@ export const CheckoutFlow: React.FC = () => {
                         </div>
 
                         {/* Logistics Photo Thumbnail */}
-                        <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 border border-white/10 hidden sm:block">
-                          <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
+                        <div className="relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border border-white/10 hidden sm:block">
+                          <Image src={opt.image} alt={opt.name} fill sizes="64px" className="object-cover" />
                         </div>
 
                         <div>
@@ -790,9 +791,11 @@ export const CheckoutFlow: React.FC = () => {
               <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                 {cart.map((item, idx) => (
                   <div key={idx} className="flex gap-3 text-xs">
-                    <img
+                    <Image
                       src={item.product.images[0]}
                       alt={item.product.name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-lg object-cover bg-[#0A0A0E] border border-white/10 shrink-0"
                     />
                     <div className="flex-1 min-w-0">

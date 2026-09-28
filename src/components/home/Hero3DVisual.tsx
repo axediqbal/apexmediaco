@@ -22,6 +22,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { Rotate3d, Shield } from 'lucide-react';
+import Image from 'next/image';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface Hero3DVisualProps {
@@ -713,10 +714,12 @@ export const Hero3DVisual: React.FC<Hero3DVisualProps> = ({
       {/* Reduced Motion OR Static Poster Fallback */}
       {prefersReduced ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0D121F]">
-          <img
+          <Image
             src={posterFallback}
             alt="APEX 3D Safe Vault Poster"
-            className="w-full h-full object-cover opacity-85"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-85"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0C] via-transparent to-transparent opacity-80" />
           <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-xs font-mono text-[#F8F9FD]">

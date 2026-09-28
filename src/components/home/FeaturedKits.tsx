@@ -23,6 +23,7 @@ import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import Image from 'next/image';
 import QuickSpecDrawer from '@/components/products/QuickSpecDrawer';
 
 interface FeaturedKitsProps {
@@ -93,10 +94,12 @@ export const FeaturedKits: React.FC<FeaturedKitsProps> = ({ products }) => {
                   <GlassCard className="h-full flex flex-col justify-between p-4 group-hover:border-[#2D68FF]/50 transition-all duration-300">
                     {/* Image thumbnail frame */}
                     <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-4">
-                      <img
+                      <Image
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       />
 
                       {/* Category tag */}

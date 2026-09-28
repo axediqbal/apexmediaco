@@ -18,6 +18,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Layers, ShieldCheck, Cpu, Truck, Sparkles, ArrowRight, Box } from 'lucide-react';
 import Container from '@/components/ui/Container';
+import Image from 'next/image';
 import GlassCard from '@/components/ui/GlassCard';
 
 export const BentoGrid: React.FC = () => {
@@ -128,10 +129,12 @@ export const BentoGrid: React.FC = () => {
                 </p>
 
                 <div className="relative aspect-[16/9] rounded-lg overflow-hidden my-2 border border-white/[0.08]">
-                  <img
+                  <Image
                     src="/images/agency/design-sprint-whiteboard.jpg"
                     alt="APEX Token Design Sprint"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
               </div>
@@ -162,10 +165,12 @@ export const BentoGrid: React.FC = () => {
 
                 {/* Logistics Photography Window */}
                 <div className="relative aspect-[16/7] rounded-xl overflow-hidden my-3 border border-white/[0.08] group/img">
-                  <img
+                  <Image
                     src="/images/logistics/terminal-night.jpg"
                     alt="APEX National Logistics Hub at Night"
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-70" />
                   <div className="absolute bottom-2.5 left-3 flex items-center gap-2">
@@ -213,10 +218,12 @@ export const BentoGrid: React.FC = () => {
 
                 {/* Confidential Boardroom Photo Frame */}
                 <div className="relative aspect-[16/7] rounded-xl overflow-hidden my-3 border border-white/[0.08] group/img">
-                  <img
+                  <Image
                     src="/images/agency/executive-boardroom.jpg"
                     alt="APEX Confidential Executive Boardroom & Embargo Staging"
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-70" />
                   <div className="absolute bottom-2.5 left-3 flex items-center gap-2">

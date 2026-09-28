@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Users, Cpu, Shield, ArrowUpRight, Maximize2, X, Lightbulb } from 'lucide-react';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
+import Image from 'next/image';
 import Badge from '@/components/ui/Badge';
 
 interface StudioPhoto {
@@ -109,10 +110,12 @@ export const AgencyStudio: React.FC = () => {
               >
                 {/* Photo Frame */}
                 <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[#0A0A0E] border border-white/[0.08] mb-6 group/img">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-75" />
 
@@ -179,10 +182,12 @@ export const AgencyStudio: React.FC = () => {
               </button>
 
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-black">
-                <img
+                <Image
                   src={activePhoto.image}
                   alt={activePhoto.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
                 />
               </div>
 

@@ -147,14 +147,14 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            <a href="#privacy" className="hover:text-[#F5F5F8] transition-colors">
+            <a href="/privacy" className="hover:text-[#F5F5F8] transition-colors">
               Privacy Shield
             </a>
-            <a href="#terms" className="hover:text-[#F5F5F8] transition-colors">
+            <a href="/terms" className="hover:text-[#F5F5F8] transition-colors">
               Production Terms
             </a>
-            <a href="#soc2" className="hover:text-[#F5F5F8] transition-colors flex items-center gap-1">
-              SOC2 Type II <ArrowUpRight className="w-3 h-3 text-[#2D68FF]" />
+            <a href="/terms#security" className="hover:text-[#F5F5F8] transition-colors flex items-center gap-1">
+              Security <ArrowUpRight className="w-3 h-3 text-[#2D68FF]" />
             </a>
           </div>
         </div>

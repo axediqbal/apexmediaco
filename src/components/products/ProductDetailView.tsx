@@ -20,6 +20,7 @@ import { useCart } from '@/context/CartContext';
 import Container from '@/components/ui/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import Badge from '@/components/ui/Badge';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 
 interface ProductDetailViewProps {
@@ -157,7 +158,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                         : 'border-white/10 hover:border-white/30 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt={`${product.name} angle ${index + 1}`} className="w-full h-full object-cover" />
+                    <Image src={img} alt={`${product.name} angle ${index + 1}`} fill sizes="25vw" className="object-cover" />
                   </button>
                 ))}
               </div>
@@ -386,8 +387,8 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               {relatedProducts.slice(0, 3).map((item) => (
                 <Link key={item.id} href={`/products/${item.slug || item.id}`} className="group block h-full">
                   <GlassCard className="p-5 h-full flex flex-col justify-between hover:border-[#2D68FF]/50 transition-all">
-                    <div className="aspect-[16/10] rounded-xl overflow-hidden bg-[#0A0A0E] mb-3 border border-white/10">
-                      <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[#0A0A0E] mb-3 border border-white/10">
+                      <Image src={item.images[0]} alt={item.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform" />
                     </div>
                     <div>
                       <Badge variant="cobalt" size="sm" className="mb-2">

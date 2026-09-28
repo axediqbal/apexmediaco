@@ -4,6 +4,8 @@ import React, { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { variantLabel } from '@/lib/variants';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 
 /**
@@ -129,7 +131,7 @@ export const CartDrawer: React.FC = () => {
           ) : (
             cart.map((item, index) => {
               const variantLabels = Object.entries(item.selectedVariants || {})
-                .map(([k, v]) => `${k}: ${v}`)
+                .map(([k, v]) => `${variantLabel(k)}: ${v}`)
                 .join(' • ');
 
               return (
@@ -139,10 +141,12 @@ export const CartDrawer: React.FC = () => {
                 >
                   {/* Thumbnail */}
                   <div className="relative w-18 h-18 rounded-lg overflow-hidden bg-[#181822] shrink-0 border border-white/10">
-                    <img
+                    <Image
                       src={item.product.images[0]}
                       alt={item.product.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="72px"
+                      className="object-cover"
                     />
                   </div>
 

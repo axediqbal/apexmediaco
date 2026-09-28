@@ -28,11 +28,14 @@ export const metadata: Metadata = {
   description: 'National creative and marketing agency storefront selling precision-engineered branded merchandise, executive apparel kits, keynote event signage, and digital brand systems.',
   keywords: ['APEX MEDIA CO', 'Agency Swag', 'Brand Collateral', 'Executive Apparel', 'Keynote Signage', 'VIP Kits', 'Digital Systems'],
   authors: [{ name: 'APEX Creative Engineering' }],
-  metadataBase: new URL('https://apexmediaco.agency'),
+  metadataBase: new URL('https://apexmediaco.vercel.app'),
+  icons: {
+    icon: '/icon',
+  },
   openGraph: {
     title: 'APEX MEDIA CO — High-Impact Brand Collateral & Merchandise',
     description: 'Precision-engineered merchandise, keynote event systems, and branded physical kits for enterprise clients.',
-    url: 'https://apexmediaco.agency',
+    url: 'https://apexmediaco.vercel.app',
     siteName: 'APEX MEDIA CO',
     locale: 'en_US',
     type: 'website',

@@ -12,6 +12,7 @@
  */
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { ShieldCheck, Sparkles, Box, Layers, Zap, CheckCircle2, Rotate3d, Compass } from 'lucide-react';
 
@@ -151,10 +152,12 @@ export const HeroCenterpiece: React.FC = () => {
           </div>
         ) : (
           <div className="relative z-10 my-5 rounded-2xl overflow-hidden aspect-[16/10] bg-[#070709] border border-white/[0.08] shadow-inner group/img">
-            <img
+            <Image
               src={activeKitData.image}
               alt={activeKitData.name}
-              className="w-full h-full object-cover transform group-hover/img:scale-105 transition-transform duration-700 ease-out"
+              fill
+              sizes="(max-width: 768px) 100vw, 60vw"
+              className="object-cover transform group-hover/img:scale-105 transition-transform duration-700 ease-out"
             />
 
             {/* Contrast protection scrim */}

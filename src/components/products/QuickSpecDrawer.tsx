@@ -5,6 +5,7 @@ import { X, Check, ShoppingBag, ShieldCheck, Star, Layers, Cpu } from 'lucide-re
 import { ProductItem } from '@/types';
 import { useCart } from '@/context/CartContext';
 import Button from '@/components/ui/Button';
+import Image from 'next/image';
 import Badge from '@/components/ui/Badge';
 
 interface QuickSpecDrawerProps {
@@ -97,7 +98,7 @@ export const QuickSpecDrawer: React.FC<QuickSpecDrawerProps> = ({ product, onClo
         <div className="p-6 space-y-6 flex-1">
           {/* Main Visual */}
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-[#0A0A0E] border border-white/10">
-            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+            <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
             <div className="absolute top-3 left-3">
               <Badge variant="cobalt" size="sm">
                 {product.category}
