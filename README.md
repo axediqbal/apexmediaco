@@ -2,6 +2,8 @@
 
 > **A portfolio-grade e-commerce storefront engineered for a premier national creative agency selling branded collateral kits, executive apparel capsules, and keynote event systems to enterprise clients.**
 
+**Live:** https://apexmediaco.vercel.app · **Repo:** https://github.com/axediqbal/apexmediaco · **Week 3 submission docs:** [`docs/SCOPE.md`](docs/SCOPE.md) · [`docs/TESTING.md`](docs/TESTING.md) · [`docs/WEEK3-SUMMARY.md`](docs/WEEK3-SUMMARY.md) · [`docs/VIDEO-SCRIPT.md`](docs/VIDEO-SCRIPT.md) · [`CHANGELOG.md`](CHANGELOG.md)
+
 ![APEX MEDIA CO Platform Banner](https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1400&q=80)
 
 ---
@@ -151,14 +153,26 @@ apex-media-co/
 
 ## 7. Testing & Verification Summary
 
+Full evidence: [`docs/TESTING.md`](docs/TESTING.md). Highlights:
+
 | Test Area | Validation Check | Result |
 | :--- | :--- | :--- |
-| **TypeScript Strict Checking** | `npx tsc --noEmit` | **0 Errors** — Fully type-safe models, props, and API handlers. |
-| **Production Build** | `npm run build` | **0 Errors** — Turbopack compiled and SSG/Dynamic pages generated cleanly. |
-| **Out-of-Stock Kit Handling** | Items with `stock: 0` | Rendered "Waitlist Only" badge, disabled checkout add, modal alert. |
-| **Empty Cart Checkout Guard** | Direct navigation to `/checkout` | Displays empty cart warning screen with direct return button. |
-| **Form Validation Safety** | Submitting incomplete PO forms | Real-time inline field validation prevents submission. |
-| **In-Memory Fallback** | Operating without MongoDB URI | In-memory store automatically hydrates seed dataset with full CRUD. |
+| **API integration suite** | `npm run test:api` — 14 assertions (admin-key fail-closed, server repricing, validation, idempotency, rate limits) | **14/14 PASS** |
+| **Live tamper test** | Order sent with `total: 1` to production | Server re-priced from catalog ($2,652); client totals never trusted |
+| **TypeScript Strict Checking** | `npx tsc --noEmit` | **0 Errors** |
+| **Production Build** | `npm run build` | **0 Errors** |
+| **Out-of-Stock Kit Handling** | Items with `stock: 0` | "Waitlist Only" badge, disabled add, waitlist form offered |
+| **Empty Cart Checkout Guard** | Direct navigation to `/checkout` | Empty-state screen with return button |
+| **Form Validation Safety** | Submitting incomplete checkout forms | Real-time inline validation blocks submission |
+| **In-Memory Fallback** | Operating without MongoDB URI | Seeded in-memory store hydrates automatically, full flow works offline |
+| **Seed idempotency** | `POST /api/seed` without `?force=true` | Refuses to overwrite; force re-seed verified live (8 products, mongodb mode) |
+
+## 10. With More Time
+
+One improvement: integrate a real payment gateway (e.g. Stripe) with webhook-verified capture,
+replacing the current corporate PO / purchasing-card method selection, plus an authenticated
+admin dashboard for order fulfillment. The data model already supports this — orders are
+server-priced and immutable, so payment can attach without restructuring.
 
 ---
 
