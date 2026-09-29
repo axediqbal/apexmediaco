@@ -2,7 +2,7 @@
 
 > **A portfolio-grade e-commerce storefront engineered for a premier national creative agency selling branded collateral kits, executive apparel capsules, and keynote event systems to enterprise clients.**
 
-**Live:** https://apexmediaco.vercel.app · **Repo:** https://github.com/axediqbal/apexmediaco · **Week 3 submission docs:** [`docs/SCOPE.md`](docs/SCOPE.md) · [`docs/TESTING.md`](docs/TESTING.md) · [`docs/WEEK3-SUMMARY.md`](docs/WEEK3-SUMMARY.md) · [`docs/VIDEO-SCRIPT.md`](docs/VIDEO-SCRIPT.md) · [`CHANGELOG.md`](CHANGELOG.md)
+**Live:** https://apexmediaco.vercel.app · **Repo:** https://github.com/axediqbal/apexmediaco · **Week 3 submission docs:** [`docs/SCOPE.md`](docs/SCOPE.md) · [`docs/PRD.md`](docs/PRD.md) · [`docs/TRD.md`](docs/TRD.md) · [`docs/UI-UX-DESIGN.md`](docs/UI-UX-DESIGN.md) · [`docs/BACKEND-SCHEMA.md`](docs/BACKEND-SCHEMA.md) · [`docs/TESTING.md`](docs/TESTING.md) · [`docs/WEEK3-SUMMARY.md`](docs/WEEK3-SUMMARY.md) · [`docs/VIDEO-SCRIPT.md`](docs/VIDEO-SCRIPT.md) · [`CHANGELOG.md`](CHANGELOG.md)
 
 ![APEX MEDIA CO Platform Banner](https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1400&q=80)
 
