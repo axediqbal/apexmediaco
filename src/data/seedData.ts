@@ -230,7 +230,7 @@ export const SEED_PRODUCTS: ProductItem[] = [
     price: 380,
     category: 'VIP Kits',
     images: [
-      'https://images.unsplash.com/photo-1585336261026-6a56e6d1dfc7?auto=format&fit=crop&w=1200&q=80',
+      '/images/products/monolith-desk.jpg',
       'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=1200&q=80'
     ],
