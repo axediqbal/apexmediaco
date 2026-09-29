@@ -1,0 +1,25 @@
+=== apexmediaco API integration test run ===
+Date: 2026-09-29 14:13 UTC
+Command: npm run build && npm run test:api
+
+(full output below)
+
+> apex-media-co@0.1.0 test:api
+> node scripts/api-tests.mjs
+
+PASS  GET /api/orders without admin key → 401
+PASS  GET /api/seed without admin key → 401
+PASS  POST /api/seed without admin key → 401
+PASS  GET /api/products returns a product
+PASS  POST /api/orders ignores client totals (server re-prices)
+PASS  POST /api/orders invalid email → 400
+PASS  POST /api/orders empty cart → 400
+PASS  POST /api/orders unknown product → 400
+PASS  POST /api/orders quantity > 99 → 400
+PASS  POST /api/newsletter invalid email → 400
+PASS  POST /api/newsletter subscribe → 201, re-subscribe → 200 (idempotent)
+PASS  POST /api/waitlist invalid email → 400
+PASS  POST /api/waitlist unknown product → 404
+PASS  POST /api/waitlist join → 201, re-join → 200 (idempotent)
+
+14/14 passed
